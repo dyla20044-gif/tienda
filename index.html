@@ -293,7 +293,8 @@
         const securityModal = document.getElementById('security-check-modal');
         const securityText = document.getElementById('security-message-text');
 
-        const APK_URL = "https://tienda-m4mp.onrender.com/sala-cine.apk"; // URL de tu APK
+        // URL del APK alojado en Render.com (¡CORREGIDA CON EL NOMBRE FINAL!)
+        const APK_URL = "https://tienda-m4mp.onrender.com/app-release[1].apk"; 
 
         let isInitialized = false;
         let userUid = null;
@@ -320,11 +321,10 @@
 
                 // 2. CARGA LA PUNTUACIÓN PROMEDIO
                 const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
-                let average = 1.1; // VALOR INICIAL BAJO
+                let average = 1.1; // VALOR INICIAL BAJO (1.1)
                 if (ratingDoc.exists) {
                     const data = ratingDoc.data();
                     if (data.totalVotes > 0) {
-                        // Cálculo real si hay votos
                         average = (data.totalScore / data.totalVotes);
                     }
                 }
