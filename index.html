@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Descargar Sala Cine APK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #3B227B; /* Color de fondo de tu marca */
+            background-color: #3B227B; 
             color: white;
             text-align: center;
             padding: 20px;
@@ -19,32 +20,35 @@
             margin: 0;
         }
         .container {
-            background-color: #1a1a1a; /* Gris oscuro para contraste */
+            background-color: #1a1a1a; 
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             max-width: 400px;
             width: 90%;
         }
+        /* ESTILO CLAVE: BORDE ROJO DE LOGO */
         .logo-placeholder {
             width: 100px;
             height: 100px;
-            background-color: transparent; /* Fondo transparente para que se vea tu imagen */
+            background-color: transparent; 
             border-radius: 20px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; 
+            overflow: hidden;
+            /* El borde que pediste */
+            border: 4px solid #E50914; 
         }
         .logo-placeholder img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ajusta la imagen al contenedor */
+            object-fit: cover; 
             border-radius: 20px;
         }
         h1 {
-            color: #E50914; /* Rojo acento */
+            color: #E50914; 
             margin-bottom: 10px;
         }
         p {
@@ -52,7 +56,7 @@
             line-height: 1.5;
         }
         .download-button {
-            background-color: #E50914; /* Rojo acento */
+            background-color: #E50914; 
             color: white;
             padding: 15px 30px;
             text-decoration: none;
@@ -70,23 +74,86 @@
             font-size: 14px;
             color: #aaa;
         }
+        /* ESTILOS AÑADIDOS PARA LAS ESTRELLAS Y DESCARGAS */
+        .rating-summary {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .rating-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+        }
+        .stars {
+            color: #FFC107; /* Amarillo de las estrellas */
+            font-size: 1.2em;
+        }
+        .downloads-count {
+            font-size: 1.1em;
+            color: #aaa;
+        }
+        .comments-section {
+            text-align: left;
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+        .comment-item {
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .comment-user {
+            font-weight: bold;
+            color: #E50914;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="logo-placeholder">
-            <img src="https://i.imgur.com/fwHx4sd.png" alt="Logo Sala Cine">
+            <img src="[URL_DE_TU_LOGO_AQUÍ]" alt="Logo Sala Cine">
         </div> 
         <h1>Sala Cine</h1>
         <p>¡La versión más reciente de Sala Cine está lista para ser instalada!</p>
         
+        <div class="rating-summary">
+            <div>
+                <div id="download-counter" class="rating-score">0</div>
+                <div class="downloads-count">Descargas</div>
+            </div>
+            <div>
+                <div id="average-rating" class="rating-score">4.5</div>
+                <div class="stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+        </div>
+        
         <a href="https://tienda-m4mp.onrender.com/sala-cine.apk" class="download-button" download>
             Descargar APK (Versión 1.0)
         </a>
+
+        <div class="comments-section">
+            <h2>Comentarios y Opiniones</h2>
+            <div id="comments-list">
+                <div class="comment-item">
+                    <span class="comment-user">UsuarioX:</span> ¡La mejor aplicación de streaming que he usado! 
+                </div>
+            </div>
+            <a href="#" style="color:#E50914; display:block; text-align:center; margin-top:10px;">Dejar mi comentario (Requiere iniciar sesión)</a>
+        </div>
         
         <div class="version">
             ⚠️ Es posible que veas una advertencia de seguridad. Debes permitir la instalación de fuentes desconocidas.
         </div>
     </div>
-</body>
+    
+    </body>
 </html>
