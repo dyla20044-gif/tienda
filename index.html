@@ -29,14 +29,19 @@
         .logo-placeholder {
             width: 100px;
             height: 100px;
-            background-color: #E50914; /* Rojo acento */
+            background-color: transparent; /* Fondo transparente para que se vea tu imagen */
             border-radius: 20px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
+            overflow: hidden; 
+        }
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ajusta la imagen al contenedor */
+            border-radius: 20px;
         }
         h1 {
             color: #E50914; /* Rojo acento */
@@ -69,15 +74,16 @@
 </head>
 <body>
     <div class="container">
-      <div class="logo-placeholder">
-    <img src="[URL_DE_TU_LOGO_AQUÍ]" alt="Logo Sala Cine" style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px;">
-</div>
-       <h1>Sala Cine</h1>
+        <div class="logo-placeholder">
+            <img src="[URL_DE_TU_LOGO_AQUÍ]" alt="Logo Sala Cine">
+        </div> 
+        <h1>Sala Cine</h1>
         <p>¡La versión más reciente de Sala Cine está lista para ser instalada!</p>
         
-        <a href="[ENLACE_A_TU_APK_AQUÍ]" class="download-button" download>
+        <a href="https://tienda-m4mp.onrender.com/sala-cine.apk" class="download-button" download>
             Descargar APK (Versión 1.0)
         </a>
+        
         <div class="version">
             ⚠️ Es posible que veas una advertencia de seguridad. Debes permitir la instalación de fuentes desconocidas.
         </div>
