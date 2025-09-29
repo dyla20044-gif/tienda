@@ -324,6 +324,7 @@
                 if (ratingDoc.exists) {
                     const data = ratingDoc.data();
                     if (data.totalVotes > 0) {
+                        // Cálculo real si hay votos
                         average = (data.totalScore / data.totalVotes);
                     }
                 }
@@ -338,7 +339,7 @@
         function renderStars(average) {
             starDisplayElement.innerHTML = '';
             const fullStars = Math.floor(average);
-            const hasHalfStar = (average * 10) % 10 >= 5; // Mejor chequeo para .5
+            const hasHalfStar = (average * 10) % 10 >= 5; 
             for (let i = 0; i < 5; i++) {
                 const icon = document.createElement('i');
                 if (i < fullStars) {
