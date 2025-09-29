@@ -96,11 +96,17 @@
             font-size: 1.1em;
             color: #aaa;
         }
+        /* CAMBIO CLAVE: Comentarios con altura fija y scroll */
         .comments-section {
             text-align: left;
             margin-top: 20px;
             border-top: 1px solid #333;
             padding-top: 20px;
+        }
+        #comments-list {
+            max-height: 250px; /* Altura máxima fija */
+            overflow-y: auto; /* Habilita el scroll */
+            padding-right: 10px; /* Espacio para la barra de scroll */
         }
         .comment-item {
             background-color: #2a2a2a;
@@ -135,7 +141,7 @@
         }
         .rating-stars {
             display: flex;
-            flex-direction: row-reverse; /* Para que al seleccionar la primera estrella, se iluminen todas */
+            flex-direction: row-reverse; 
             justify-content: center;
         }
         #comment-text {
@@ -173,9 +179,10 @@
                 <div class="downloads-count">Descargas</div>
             </div>
             <div>
-                <div id="average-rating" class="rating-score">N/A</div>
+                <div id="average-rating" class="rating-score">4.5</div> 
                 <div id="star-display" class="stars">
-                    </div>
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
             </div>
         </div>
         
@@ -264,14 +271,15 @@
                 const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
                 if (ratingDoc.exists) {
                     const data = ratingDoc.data();
-                    const average = data.average || 0;
+                    const average = data.average || 4.5; // Si no hay datos, usa 4.5
                     avgRatingElement.textContent = average.toFixed(1);
                     renderStars(average);
                 } else {
-                    renderStars(4.0); // Valor por defecto si no hay votos
+                    renderStars(4.5); // Si el documento no existe, usa 4.5 por defecto
                 }
             } catch (error) {
                 console.error("Error al cargar estadísticas:", error);
+                renderStars(4.5);
             }
         }
 
@@ -365,12 +373,12 @@
                 batch.set(summaryRef, {
                     totalVotes: FieldValue.increment(1),
                     totalScore: FieldValue.increment(rating)
-                    // El cálculo del promedio se haría en Cloud Functions
+                    // El cálculo del promedio real debe hacerse en Cloud Functions, esto solo acumula.
                 }, { merge: true });
                 
                 await batch.commit();
 
-                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados! (Recarga para ver promedio)";
+                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados! (Refresca para verlos)";
                 commentTextarea.value = '';
                 ratingInputs.forEach(input => input.checked = false);
                 renderComments(); // Recarga la lista
