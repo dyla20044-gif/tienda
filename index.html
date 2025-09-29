@@ -38,7 +38,6 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            /* El borde que pediste */
             border: 4px solid #E50914; 
         }
         .logo-placeholder img {
@@ -65,6 +64,7 @@
             font-weight: bold;
             transition: background-color 0.3s;
             display: block;
+            margin: 20px 0;
         }
         .download-button:hover {
             background-color: #ff3333;
@@ -89,7 +89,7 @@
             color: white;
         }
         .stars {
-            color: #FFC107; /* Amarillo de las estrellas */
+            color: #FFC107; 
             font-size: 1.2em;
         }
         .downloads-count {
@@ -113,6 +113,50 @@
             font-weight: bold;
             color: #E50914;
         }
+        .rating-input {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .rating-stars label {
+            font-size: 2em;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .rating-stars input[type="radio"] {
+            display: none;
+        }
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input[type="radio"]:checked ~ label {
+            color: #FFC107;
+        }
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse; /* Para que al seleccionar la primera estrella, se iluminen todas */
+            justify-content: center;
+        }
+        #comment-text {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        #submit-comment {
+            background-color: #E50914;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -129,25 +173,35 @@
                 <div class="downloads-count">Descargas</div>
             </div>
             <div>
-                <div id="average-rating" class="rating-score">4.5</div>
-                <div class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                </div>
+                <div id="average-rating" class="rating-score">N/A</div>
+                <div id="star-display" class="stars">
+                    </div>
             </div>
         </div>
         
-        <a href="https://tienda-m4mp.onrender.com/sala-cine.apk" class="download-button" download>
+        <a href="https://tienda-m4mp.onrender.com/sala-cine.apk" id="btn-download" class="download-button" download>
             Descargar APK (Versión 1.0)
         </a>
 
         <div class="comments-section">
             <h2>Comentarios y Opiniones</h2>
-            <div id="comments-list">
-                <div class="comment-item">
-                    <span class="comment-user">UsuarioX:</span> ¡La mejor aplicación de streaming que he usado! 
+            <div id="feedback-message" style="color: #FFC107; margin-bottom: 10px;"></div>
+            
+            <div class="rating-input">
+                <div class="rating-stars">
+                    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 estrellas">★</label>
+                    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 estrellas">★</label>
+                    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 estrellas">★</label>
+                    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 estrellas">★</label>
+                    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 estrella">★</label>
                 </div>
+                <textarea id="comment-text" placeholder="Deja tu comentario sobre la app (Máx. 150 caracteres)..." maxlength="150"></textarea>
+                <button id="submit-comment">Enviar Comentario y Voto Anónimo</button>
             </div>
-            <a href="#" style="color:#E50914; display:block; text-align:center; margin-top:10px;">Dejar mi comentario (Requiere iniciar sesión)</a>
+            
+            <div id="comments-list">
+                <p style="color:#aaa; text-align:center;">Cargando comentarios...</p>
+            </div>
         </div>
         
         <div class="version">
@@ -155,5 +209,214 @@
         </div>
     </div>
     
-    </body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // === CONFIGURACIÓN DE FIREBASE (ACTUALIZA ESTOS VALORES) ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyCF5lyEIFkKhzgc4kOMebWZ7oZrxWDNw2Y", 
+            authDomain: "app-aeff2.firebaseapp.com",
+            projectId: "app-aeff2",
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const FieldValue = firebase.firestore.FieldValue;
+
+        // --- Elementos del DOM ---
+        const downloadCounterElement = document.getElementById('download-counter');
+        const downloadButton = document.getElementById('btn-download');
+        const avgRatingElement = document.getElementById('average-rating');
+        const starDisplayElement = document.getElementById('star-display');
+        const commentTextarea = document.getElementById('comment-text');
+        const submitButton = document.getElementById('submit-comment');
+        const commentsListElement = document.getElementById('comments-list');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const ratingInputs = document.querySelectorAll('input[name="rating"]');
+
+        let isInitialized = false;
+        let userUid = null;
+
+        // --- LÓGICA DE USUARIOS ANÓNIMOS ---
+        auth.signInAnonymously().then(userCredential => {
+            userUid = userCredential.user.uid;
+            isInitialized = true;
+            loadStats();
+            renderComments();
+        }).catch(error => {
+            console.error("Error signing in anonymously:", error);
+            feedbackMessage.textContent = "Error al conectar con la base de datos.";
+        });
+
+
+        // --- ESTADÍSTICAS Y CONTADORES ---
+        async function loadStats() {
+            try {
+                // 1. CARGA EL CONTADOR DE DESCARGAS
+                const statsDoc = await db.collection("app_stats").doc("download_counter").get();
+                const totalDownloads = statsDoc.exists ? statsDoc.data().total || 0 : 0;
+                downloadCounterElement.textContent = totalDownloads.toLocaleString();
+
+                // 2. CARGA LA PUNTUACIÓN PROMEDIO
+                const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
+                if (ratingDoc.exists) {
+                    const data = ratingDoc.data();
+                    const average = data.average || 0;
+                    avgRatingElement.textContent = average.toFixed(1);
+                    renderStars(average);
+                } else {
+                    renderStars(4.0); // Valor por defecto si no hay votos
+                }
+            } catch (error) {
+                console.error("Error al cargar estadísticas:", error);
+            }
+        }
+
+        function renderStars(average) {
+            starDisplayElement.innerHTML = '';
+            const fullStars = Math.floor(average);
+            const hasHalfStar = average % 1 >= 0.5;
+            for (let i = 0; i < 5; i++) {
+                const icon = document.createElement('i');
+                if (i < fullStars) {
+                    icon.className = "fas fa-star";
+                } else if (i === fullStars && hasHalfStar) {
+                    icon.className = "fas fa-star-half-alt";
+                } else {
+                    icon.className = "far fa-star";
+                }
+                starDisplayElement.appendChild(icon);
+            }
+        }
+
+
+        // --- MANEJADORES DE ACCIONES ---
+        
+        // 1. INCREMENTAR DESCARGAS
+        async function incrementDownloadCount() {
+            try {
+                const statRef = db.collection("app_stats").doc("download_counter");
+                // Incrementa el valor de 'total' en 1 de forma segura (Transacción)
+                await db.runTransaction(async (transaction) => {
+                    const statDoc = await transaction.get(statRef);
+                    if (statDoc.exists) {
+                        const newTotal = (statDoc.data().total || 0) + 1;
+                        transaction.update(statRef, { total: newTotal });
+                    } else {
+                        transaction.set(statRef, { total: 1 });
+                    }
+                });
+                loadStats(); // Recarga el contador después de incrementar
+            } catch (error) {
+                console.error("Error al incrementar descargas:", error);
+            }
+        }
+
+        // 2. ENVIAR COMENTARIO Y VOTO
+        submitButton.addEventListener('click', async () => {
+            if (!isInitialized || !userUid) return;
+
+            const comment = commentTextarea.value.trim();
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+            const rating = ratingInput ? parseInt(ratingInput.value) : null;
+            
+            if (!rating) {
+                feedbackMessage.textContent = "Por favor, selecciona una puntuación.";
+                return;
+            }
+            if (comment.length < 5) {
+                feedbackMessage.textContent = "El comentario es muy corto.";
+                return;
+            }
+
+            try {
+                // Previene que un usuario anónimo (UID) vote dos veces
+                const hasVoted = await db.collection("ratings").where("userId", "==", userUid).limit(1).get();
+                if (!hasVoted.empty) {
+                     feedbackMessage.textContent = "Ya has enviado tu voto. ¡Gracias!";
+                     return;
+                }
+
+                // 1. GUARDAR RATING y COMENTARIO
+                const batch = db.batch();
+                const ratingRef = db.collection("ratings").doc();
+                const commentRef = db.collection("page_comments").doc();
+
+                batch.set(ratingRef, {
+                    userId: userUid,
+                    rating: rating,
+                    timestamp: FieldValue.serverTimestamp()
+                });
+                
+                batch.set(commentRef, {
+                    userId: userUid,
+                    rating: rating,
+                    comment: comment,
+                    timestamp: FieldValue.serverTimestamp()
+                });
+
+                // 2. ACTUALIZAR ESTADÍSTICAS GLOBALES
+                // Necesitas una Cloud Function o un proceso de servidor para calcular el promedio de forma segura.
+                // Por simplicidad, aquí solo incrementaremos el contador de votos.
+                const summaryRef = db.collection("app_stats").doc("rating_summary");
+                batch.set(summaryRef, {
+                    totalVotes: FieldValue.increment(1),
+                    totalScore: FieldValue.increment(rating)
+                    // El cálculo del promedio se haría en Cloud Functions
+                }, { merge: true });
+                
+                await batch.commit();
+
+                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados! (Recarga para ver promedio)";
+                commentTextarea.value = '';
+                ratingInputs.forEach(input => input.checked = false);
+                renderComments(); // Recarga la lista
+                
+            } catch (error) {
+                console.error("Error al enviar comentario:", error);
+                feedbackMessage.textContent = "Error al enviar el voto/comentario.";
+            }
+        });
+
+        // 3. RENDERIZAR COMENTARIOS
+        function renderComments() {
+             db.collection("page_comments").orderBy("timestamp", "desc").limit(10).onSnapshot(snapshot => {
+                commentsListElement.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'comment-item';
+                    
+                    // Solo muestra los primeros 7 caracteres del UID anónimo para privacidad
+                    const userName = "Anónimo " + (data.userId ? data.userId.substring(0, 7) : 'Usuario'); 
+
+                    item.innerHTML = `
+                        <span class="comment-user">${userName} (${data.rating}★):</span> ${data.comment}
+                    `;
+                    commentsListElement.appendChild(item);
+                });
+
+                if (snapshot.empty) {
+                    commentsListElement.innerHTML = '<p style="color:#aaa; text-align:center;">Sé el primero en dejar tu opinión.</p>';
+                }
+            }, error => {
+                console.error("Error real time comments:", error);
+            });
+        }
+
+
+        // Manejador del botón de descarga para incrementar el contador de descargas
+        if (downloadButton) {
+            downloadButton.addEventListener('click', (e) => {
+                // Permite el comportamiento nativo de descarga, e incrementa el contador
+                if (isInitialized) {
+                    incrementDownloadCount();
+                }
+            });
+        }
+    </script>
+</body>
 </html>
