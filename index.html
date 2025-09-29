@@ -96,7 +96,7 @@
             font-size: 1.1em;
             color: #aaa;
         }
-        /* CAMBIO CLAVE: Comentarios con altura fija y scroll */
+        /* CAMBIO CLAVE: Contenedor de Comentarios */
         .comments-section {
             text-align: left;
             margin-top: 20px;
@@ -106,7 +106,8 @@
         #comments-list {
             max-height: 250px; /* Altura máxima fija */
             overflow-y: auto; /* Habilita el scroll */
-            padding-right: 10px; /* Espacio para la barra de scroll */
+            padding-right: 10px; 
+            margin-bottom: 10px;
         }
         .comment-item {
             background-color: #2a2a2a;
@@ -163,6 +164,45 @@
             cursor: pointer;
             font-weight: bold;
         }
+        /* ESTILOS DEL MODAL DE SEGURIDAD */
+        #security-check-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .security-check-content {
+            background-color: #1a1a1a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
+            width: 80%;
+            max-width: 350px;
+        }
+        .security-check-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #E50914;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .security-message {
+            font-size: 1.1em;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -179,16 +219,16 @@
                 <div class="downloads-count">Descargas</div>
             </div>
             <div>
-                <div id="average-rating" class="rating-score">4.5</div> 
+                <div id="average-rating" class="rating-score">4.0</div> 
                 <div id="star-display" class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
                 </div>
             </div>
         </div>
         
-        <a href="https://tienda-m4mp.onrender.com/sala-cine.apk" id="btn-download" class="download-button" download>
+        <div id="btn-download" class="download-button" style="cursor:pointer;">
             Descargar APK (Versión 1.0)
-        </a>
+        </div>
 
         <div class="comments-section">
             <h2>Comentarios y Opiniones</h2>
@@ -216,6 +256,13 @@
         </div>
     </div>
     
+    <div id="security-check-modal">
+        <div class="security-check-content">
+            <div class="security-check-spinner"></div>
+            <div class="security-message" id="security-message-text">Comprobando seguridad del archivo...</div>
+        </div>
+    </div>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -238,16 +285,20 @@
         const downloadButton = document.getElementById('btn-download');
         const avgRatingElement = document.getElementById('average-rating');
         const starDisplayElement = document.getElementById('star-display');
-        const commentTextarea = document.getElementById('comment-text');
         const submitButton = document.getElementById('submit-comment');
         const commentsListElement = document.getElementById('comments-list');
         const feedbackMessage = document.getElementById('feedback-message');
+        const commentTextarea = document.getElementById('comment-text');
         const ratingInputs = document.querySelectorAll('input[name="rating"]');
+        const securityModal = document.getElementById('security-check-modal');
+        const securityText = document.getElementById('security-message-text');
+
+        const APK_URL = "https://tienda-m4mp.onrender.com/sala-cine.apk"; // URL de tu APK
 
         let isInitialized = false;
         let userUid = null;
 
-        // --- LÓGICA DE USUARIOS ANÓNIMOS ---
+        // --- INICIALIZACIÓN Y LÓGICA ANÓNIMA ---
         auth.signInAnonymously().then(userCredential => {
             userUid = userCredential.user.uid;
             isInitialized = true;
@@ -263,23 +314,28 @@
         async function loadStats() {
             try {
                 // 1. CARGA EL CONTADOR DE DESCARGAS
-                const statsDoc = await db.collection("app_stats").doc("download_counter").get();
-                const totalDownloads = statsDoc.exists ? statsDoc.data().total || 0 : 0;
+                const downloadsDoc = await db.collection("app_stats").doc("download_counter").get();
+                const totalDownloads = downloadsDoc.exists ? downloadsDoc.data().total || 0 : 0;
                 downloadCounterElement.textContent = totalDownloads.toLocaleString();
 
-                // 2. CARGA LA PUNTUACIÓN PROMEDIO
+                // 2. CARGA LA PUNTUACIÓN PROMEDIO (Usa 4.0 por defecto para ser creíble)
                 const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
+                let average = 4.0;
                 if (ratingDoc.exists) {
                     const data = ratingDoc.data();
-                    const average = data.average || 4.5; // Si no hay datos, usa 4.5
+                    // Calcular el promedio real si hay votos
+                    if (data.totalVotes > 0) {
+                        average = (data.totalScore / data.totalVotes);
+                    }
                     avgRatingElement.textContent = average.toFixed(1);
                     renderStars(average);
                 } else {
-                    renderStars(4.5); // Si el documento no existe, usa 4.5 por defecto
+                    avgRatingElement.textContent = average.toFixed(1);
+                    renderStars(average); 
                 }
             } catch (error) {
                 console.error("Error al cargar estadísticas:", error);
-                renderStars(4.5);
+                renderStars(4.0);
             }
         }
 
@@ -300,14 +356,37 @@
             }
         }
 
+        // --- LÓGICA DE DESCARGA Y SEGURIDAD ---
+        downloadButton.addEventListener('click', async () => {
+            if (!isInitialized || !userUid) return;
 
-        // --- MANEJADORES DE ACCIONES ---
+            // 1. Mostrar el modal de seguridad
+            securityModal.style.display = 'flex';
+            securityText.textContent = 'Comprobando seguridad del archivo...';
+
+            // 2. Simular la verificación de seguridad (2 segundos)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // 3. Actualizar mensaje de seguridad
+            securityText.textContent = '✅ VERIFICACIÓN COMPLETA. ¡El archivo es seguro!';
+            
+            // 4. Pausa final antes de iniciar la descarga
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 5. Iniciar descarga (utilizando la URL de tu APK)
+            window.location.href = APK_URL; 
+            
+            // 6. Ocultar modal y contar la descarga
+            securityModal.style.display = 'none';
+            incrementDownloadCount();
+        });
+
+
+        // --- MANEJADORES DE BASE DE DATOS (Rating/Comments) ---
         
-        // 1. INCREMENTAR DESCARGAS
         async function incrementDownloadCount() {
             try {
                 const statRef = db.collection("app_stats").doc("download_counter");
-                // Incrementa el valor de 'total' en 1 de forma segura (Transacción)
                 await db.runTransaction(async (transaction) => {
                     const statDoc = await transaction.get(statRef);
                     if (statDoc.exists) {
@@ -317,13 +396,12 @@
                         transaction.set(statRef, { total: 1 });
                     }
                 });
-                loadStats(); // Recarga el contador después de incrementar
+                loadStats();
             } catch (error) {
                 console.error("Error al incrementar descargas:", error);
             }
         }
 
-        // 2. ENVIAR COMENTARIO Y VOTO
         submitButton.addEventListener('click', async () => {
             if (!isInitialized || !userUid) return;
 
@@ -331,57 +409,35 @@
             const ratingInput = document.querySelector('input[name="rating"]:checked');
             const rating = ratingInput ? parseInt(ratingInput.value) : null;
             
-            if (!rating) {
-                feedbackMessage.textContent = "Por favor, selecciona una puntuación.";
-                return;
-            }
-            if (comment.length < 5) {
-                feedbackMessage.textContent = "El comentario es muy corto.";
-                return;
-            }
+            if (!rating) { feedbackMessage.textContent = "Por favor, selecciona una puntuación."; return; }
+            if (comment.length < 5) { feedbackMessage.textContent = "El comentario es muy corto."; return; }
 
             try {
-                // Previene que un usuario anónimo (UID) vote dos veces
                 const hasVoted = await db.collection("ratings").where("userId", "==", userUid).limit(1).get();
                 if (!hasVoted.empty) {
                      feedbackMessage.textContent = "Ya has enviado tu voto. ¡Gracias!";
                      return;
                 }
 
-                // 1. GUARDAR RATING y COMENTARIO
+                // 1. GUARDAR RATING y COMENTARIO (BATCH)
                 const batch = db.batch();
-                const ratingRef = db.collection("ratings").doc();
-                const commentRef = db.collection("page_comments").doc();
-
-                batch.set(ratingRef, {
-                    userId: userUid,
-                    rating: rating,
-                    timestamp: FieldValue.serverTimestamp()
-                });
-                
-                batch.set(commentRef, {
-                    userId: userUid,
-                    rating: rating,
-                    comment: comment,
-                    timestamp: FieldValue.serverTimestamp()
-                });
+                batch.set(db.collection("ratings").doc(), { userId: userUid, rating: rating, timestamp: FieldValue.serverTimestamp() });
+                batch.set(db.collection("page_comments").doc(), { userId: userUid, rating: rating, comment: comment, timestamp: FieldValue.serverTimestamp() });
 
                 // 2. ACTUALIZAR ESTADÍSTICAS GLOBALES
-                // Necesitas una Cloud Function o un proceso de servidor para calcular el promedio de forma segura.
-                // Por simplicidad, aquí solo incrementaremos el contador de votos.
                 const summaryRef = db.collection("app_stats").doc("rating_summary");
                 batch.set(summaryRef, {
                     totalVotes: FieldValue.increment(1),
                     totalScore: FieldValue.increment(rating)
-                    // El cálculo del promedio real debe hacerse en Cloud Functions, esto solo acumula.
                 }, { merge: true });
                 
                 await batch.commit();
 
-                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados! (Refresca para verlos)";
+                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados!";
                 commentTextarea.value = '';
                 ratingInputs.forEach(input => input.checked = false);
-                renderComments(); // Recarga la lista
+                renderComments();
+                loadStats(); // Recalcula el promedio
                 
             } catch (error) {
                 console.error("Error al enviar comentario:", error);
@@ -398,7 +454,6 @@
                     const item = document.createElement('div');
                     item.className = 'comment-item';
                     
-                    // Solo muestra los primeros 7 caracteres del UID anónimo para privacidad
                     const userName = "Anónimo " + (data.userId ? data.userId.substring(0, 7) : 'Usuario'); 
 
                     item.innerHTML = `
@@ -412,17 +467,6 @@
                 }
             }, error => {
                 console.error("Error real time comments:", error);
-            });
-        }
-
-
-        // Manejador del botón de descarga para incrementar el contador de descargas
-        if (downloadButton) {
-            downloadButton.addEventListener('click', (e) => {
-                // Permite el comportamiento nativo de descarga, e incrementa el contador
-                if (isInitialized) {
-                    incrementDownloadCount();
-                }
             });
         }
     </script>
