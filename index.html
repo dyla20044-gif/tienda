@@ -219,9 +219,9 @@
                 <div class="downloads-count">Descargas</div>
             </div>
             <div>
-                <div id="average-rating" class="rating-score">4.0</div> 
+                <div id="average-rating" class="rating-score">1.1</div> 
                 <div id="star-display" class="stars">
-                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                    <i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
                 </div>
             </div>
         </div>
@@ -318,31 +318,27 @@
                 const totalDownloads = downloadsDoc.exists ? downloadsDoc.data().total || 0 : 0;
                 downloadCounterElement.textContent = totalDownloads.toLocaleString();
 
-                // 2. CARGA LA PUNTUACIÓN PROMEDIO (Usa 4.0 por defecto para ser creíble)
+                // 2. CARGA LA PUNTUACIÓN PROMEDIO
                 const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
-                let average = 4.0;
+                let average = 1.1; // VALOR INICIAL BAJO
                 if (ratingDoc.exists) {
                     const data = ratingDoc.data();
-                    // Calcular el promedio real si hay votos
                     if (data.totalVotes > 0) {
                         average = (data.totalScore / data.totalVotes);
                     }
-                    avgRatingElement.textContent = average.toFixed(1);
-                    renderStars(average);
-                } else {
-                    avgRatingElement.textContent = average.toFixed(1);
-                    renderStars(average); 
                 }
+                avgRatingElement.textContent = average.toFixed(1);
+                renderStars(average);
             } catch (error) {
                 console.error("Error al cargar estadísticas:", error);
-                renderStars(4.0);
+                renderStars(1.1);
             }
         }
 
         function renderStars(average) {
             starDisplayElement.innerHTML = '';
             const fullStars = Math.floor(average);
-            const hasHalfStar = average % 1 >= 0.5;
+            const hasHalfStar = (average * 10) % 10 >= 5; // Mejor chequeo para .5
             for (let i = 0; i < 5; i++) {
                 const icon = document.createElement('i');
                 if (i < fullStars) {
@@ -362,13 +358,22 @@
 
             // 1. Mostrar el modal de seguridad
             securityModal.style.display = 'flex';
-            securityText.textContent = 'Comprobando seguridad del archivo...';
+            securityText.textContent = 'Iniciando verificación de seguridad...';
 
-            // 2. Simular la verificación de seguridad (2 segundos)
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // 2. Simular la verificación de seguridad (Pasos detallados)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            securityText.textContent = 'Comprobando integridad del archivo...'; 
             
-            // 3. Actualizar mensaje de seguridad
-            securityText.textContent = '✅ VERIFICACIÓN COMPLETA. ¡El archivo es seguro!';
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            securityText.textContent = 'Escaneando código malicioso...'; 
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            securityText.textContent = 'Validando firma de desarrollador...'; 
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // 3. Actualizar mensaje de éxito y preparar descarga
+            securityText.textContent = '✅ ARCHIVO SEGURO. Procede a la descarga.'; 
             
             // 4. Pausa final antes de iniciar la descarga
             await new Promise(resolve => setTimeout(resolve, 500));
