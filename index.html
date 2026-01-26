@@ -2,478 +2,648 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Descargar Sala Cine APK</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Banca Móvil - Interfaz Profesional</title>
     <style>
+        /* * =========================================
+         * 1. VARIABLES & RESET (CSS Moderno)
+         * =========================================
+         */
+        :root {
+            /* Branding Banco Pichincha */
+            --brand-yellow: #FFDD00;
+            --brand-blue: #0F265C;
+            --brand-blue-dark: #0a1b45;
+            
+            /* UI Colors */
+            --bg-body: #F4F6F9;
+            --bg-white: #FFFFFF;
+            --text-primary: #0F265C; /* Azul oscuro para textos principales */
+            --text-secondary: #6B7280; /* Gris para textos secundarios */
+            --border-color: #E5E7EB;
+            --success-green: #008f39; /* Para badges o estados */
+            
+            /* Espaciado y Dimensiones */
+            --radius-card: 16px;
+            --radius-btn: 12px;
+            --spacing-container: 20px;
+            
+            /* Sombras Suaves (Elevation) */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #3B227B; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.5;
+            padding-bottom: 80px; /* Espacio para el navbar fijo */
+        }
+
+        /* Contenedor simulador móvil (opcional para desktop) */
+        .app-container {
+            max-width: 480px; /* Ancho típico de móvil */
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--bg-body);
+            position: relative;
+        }
+
+        /* Utilidades */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .font-bold { font-weight: 700; }
+        .text-blue { color: var(--brand-blue); }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .hidden { display: none; }
+
+        /* * =========================================
+         * 2. HEADER
+         * =========================================
+         */
+        .header {
+            background-color: var(--bg-white);
+            padding: 16px var(--spacing-container);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-logo img {
+            height: 40px; /* Ajustable según el logo */
+            width: auto;
+            display: block;
+        }
+
+        .header-help {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* * =========================================
+         * 3. PROMO BANNER
+         * =========================================
+         */
+        .promo-banner {
+            margin: 20px var(--spacing-container);
+            background-color: var(--bg-white);
+            border-radius: var(--radius-card);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .promo-banner:active { transform: scale(0.98); }
+
+        .promo-icon {
+            background-color: var(--bg-body);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .promo-content { flex-grow: 1; }
+        .promo-title { font-weight: 700; color: var(--brand-blue); font-size: 0.95rem; display: block; }
+        .promo-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.2; }
+
+        /* * =========================================
+         * 4. SECCIÓN MIS PRODUCTOS (TABS & CARDS)
+         * =========================================
+         */
+        .section-header {
+            padding: 0 var(--spacing-container);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title { font-size: 1.25rem; font-weight: 800; color: var(--brand-blue); }
+        .link-view-all { color: #007ACC; font-size: 0.9rem; font-weight: 600; text-decoration: none; }
+
+        .products-counter { font-weight: 400; font-size: 0.9rem; color: var(--text-secondary); margin-left: var(--spacing-container); margin-bottom: 15px; display: block; margin-top: -8px;}
+
+        /* TABS */
+        .tabs-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 var(--spacing-container);
+            gap: 12px;
+            margin-bottom: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .tabs-container::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--brand-blue-dark); /* Color más oscuro para el tab activo */
             color: white;
-            text-align: center;
+            border-color: var(--brand-blue-dark);
+            background-color: #E2E8F0; /* Estilo tipo pichincha: gris suave seleccionado */
+            color: var(--brand-blue);
+            font-weight: 800;
+        }
+
+        /* ACCOUNT CARDS SWIPER */
+        .cards-scroll-wrapper {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px var(--spacing-container) 30px var(--spacing-container);
+            gap: 16px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .cards-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .account-card {
+            min-width: 85%; /* Muestra un poco de la siguiente tarjeta */
+            background: var(--bg-white);
+            border-radius: var(--radius-card);
             padding: 20px;
+            box-shadow: var(--shadow-md);
+            scroll-snap-align: center;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 180px;
+        }
+
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .account-name { font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 4px; text-transform: uppercase;}
+        .account-number { font-size: 0.9rem; color: var(--text-secondary); letter-spacing: 1px; }
+        
+        .fav-badge {
+            background-color: #FFFbeb; /* Amarillo muy suave */
+            color: #b45309;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+        .fav-star { color: var(--brand-yellow); }
+
+        .card-middle { margin-top: auto; }
+        .label-balance { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; }
+        
+        .balance-row { display: flex; align-items: center; gap: 10px; }
+        .balance-amount { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
+        .balance-hidden { letter-spacing: 3px; font-family: monospace; font-size: 1.5rem; }
+        
+        .btn-toggle-eye {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--brand-blue);
+            padding: 5px;
+        }
+
+        .account-type {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: -10px;
+        }
+
+        /* * =========================================
+         * 5. ACTIONS GRID (QUÉ QUIERES HACER)
+         * =========================================
+         */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 var(--spacing-container);
+            margin-bottom: 30px;
+        }
+
+        .action-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-btn);
+            padding: 16px 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 110px;
         }
-        .container {
-            background-color: #1a1a1a; 
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            max-width: 400px;
-            width: 90%;
-        }
-        /* ESTILO CLAVE: BORDE ROJO DE LOGO */
-        .logo-placeholder {
-            width: 100px;
-            height: 100px;
-            background-color: transparent; 
-            border-radius: 20px;
-            margin: 0 auto 20px;
+
+        .action-card:active { background-color: #f8fafc; transform: scale(0.96); }
+
+        .action-icon-box {
+            margin-bottom: 10px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            border: 4px solid #E50914; 
         }
-        .logo-placeholder img {
+        
+        .action-icon-box svg {
             width: 100%;
             height: 100%;
-            object-fit: cover; 
-            border-radius: 20px;
+            fill: var(--text-primary); /* Iconos color azul oscuro */
         }
-        h1 {
-            color: #E50914; 
-            margin-bottom: 10px;
+
+        .action-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
         }
-        p {
-            margin-bottom: 30px;
-            line-height: 1.5;
+
+        /* Botón QR Deuna Especial */
+        .action-card.deuna {
+            border: 2px solid var(--brand-yellow);
+            position: relative;
         }
-        .download-button {
-            background-color: #E50914; 
+        
+        .deuna-logo {
+            color: #4B0082; /* Color morado aprox Deuna */
+            font-weight: 900;
+            font-style: italic;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .badge-new {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #00A99D;
             color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 18px;
+            font-size: 0.6rem;
             font-weight: bold;
-            transition: background-color 0.3s;
-            display: block;
-            margin: 20px 0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
-        .download-button:hover {
-            background-color: #ff3333;
-        }
-        .version {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        /* ESTILOS AÑADIDOS PARA LAS ESTRELLAS Y DESCARGAS */
-        .rating-summary {
+
+        /* * =========================================
+         * 6. BOTTOM NAVIGATION
+         * =========================================
+         */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0; 
+            right: 0;
+            background: var(--bg-white);
+            height: 70px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            margin: 20px 0;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+            max-width: 480px; /* Mantener en container si es desktop */
+            margin: 0 auto; /* Centrar si es desktop */
         }
-        .rating-score {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: white;
-        }
-        .stars {
-            color: #FFC107; 
-            font-size: 1.2em;
-        }
-        .downloads-count {
-            font-size: 1.1em;
-            color: #aaa;
-        }
-        /* CAMBIO CLAVE: Contenedor de Comentarios */
-        .comments-section {
-            text-align: left;
-            margin-top: 20px;
-            border-top: 1px solid #333;
-            padding-top: 20px;
-        }
-        #comments-list {
-            max-height: 250px; /* Altura máxima fija */
-            overflow-y: auto; /* Habilita el scroll */
-            padding-right: 10px; 
-            margin-bottom: 10px;
-        }
-        .comment-item {
-            background-color: #2a2a2a;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-        }
-        .comment-user {
-            font-weight: bold;
-            color: #E50914;
-        }
-        .rating-input {
-            margin-bottom: 15px;
+
+        .nav-item {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-        }
-        .rating-stars label {
-            font-size: 2em;
-            color: #555;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .rating-stars input[type="radio"] {
-            display: none;
-        }
-        .rating-stars label:hover,
-        .rating-stars label:hover ~ label,
-        .rating-stars input[type="radio"]:checked ~ label {
-            color: #FFC107;
-        }
-        .rating-stars {
-            display: flex;
-            flex-direction: row-reverse; 
-            justify-content: center;
-        }
-        #comment-text {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: white;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        #submit-comment {
-            background-color: #E50914;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        /* ESTILOS DEL MODAL DE SEGURIDAD */
-        #security-check-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 9999;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            flex: 1;
+            height: 100%;
+            cursor: pointer;
         }
-        .security-check-content {
-            background-color: #1a1a1a;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(229, 9, 20, 0.5);
-            width: 80%;
-            max-width: 350px;
+
+        .nav-item.active {
+            color: var(--brand-blue);
         }
-        .security-check-spinner {
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid #E50914;
+
+        .nav-item.active .nav-indicator {
+            background-color: var(--brand-blue);
+            height: 4px;
+            width: 4px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-            margin: 0 auto 20px;
+            margin-top: 4px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .nav-icon svg { width: 24px; height: 24px; fill: currentColor; }
+        .nav-text { font-size: 0.75rem; margin-top: 4px; font-weight: 500; }
+
+        .btn-home-indicator {
+            background-color: #E6EAF0;
+            padding: 8px 16px;
+            border-radius: 20px;
         }
-        .security-message {
-            font-size: 1.1em;
-            color: white;
+        .nav-item.active .btn-home-indicator {
+            color: var(--brand-blue);
         }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo-placeholder">
-            <img src="https://i.imgur.com/6lbvOPd.png" alt="Logo Sala Cine">
-        </div> 
-        <h1>Sala Cine</h1>
-        <p>¡La versión más reciente de Sala Cine está lista para ser instalada!</p>
+
+    <div class="app-container">
         
-        <div class="rating-summary">
-            <div>
-                <div id="download-counter" class="rating-score">0</div>
-                <div class="downloads-count">Descargas</div>
+        <header class="header">
+            <div class="header-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Banco_Pichincha_Logo.png/1200px-Banco_Pichincha_Logo.png?20200922153835" alt="Banco Pichincha">
             </div>
-            <div>
-                <div id="average-rating" class="rating-score">1.1</div> 
-                <div id="star-display" class="stars">
-                    <i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
-                </div>
+            <div class="header-help" onclick="showAlert('Abrir Centro de Ayuda')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>Ayuda</span>
             </div>
-        </div>
-        
-        <div id="btn-download" class="download-button" style="cursor:pointer;">
-            Descargar APK (Versión 1.0)
+        </header>
+
+        <div class="promo-banner" onclick="showAlert('Abrir formulario nueva cuenta')">
+            <div class="promo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F265C" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+                <div style="position:absolute; margin-left:12px; margin-top:12px; background:#FFDD00; width:12px; height:12px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold;">+</div>
+            </div>
+            <div class="promo-content">
+                <span class="promo-title">¿Necesitas una cuenta?</span>
+                <span class="promo-desc">Abre aquí una cuenta adicional y organiza tu dinero.</span>
+            </div>
+            <div style="color:var(--brand-blue);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </div>
         </div>
 
-        <div class="comments-section">
-            <h2>Comentarios y Opiniones</h2>
-            <div id="feedback-message" style="color: #FFC107; margin-bottom: 10px;"></div>
+        <section class="products-section">
+            <div class="section-header">
+                <h2 class="section-title">Mis productos</h2>
+                <a href="#" class="link-view-all" onclick="showAlert('Ver todos los productos')">Ver todos →</a>
+            </div>
+            <span class="products-counter">Tienes 7 productos</span>
+
+            <div class="tabs-container" id="tabs-container">
+                <button class="tab-btn active" onclick="switchTab(this, 'cuentas')">Cuentas</button>
+                <button class="tab-btn" onclick="switchTab(this, 'tarjetas')">Tarjetas</button>
+                <button class="tab-btn" onclick="switchTab(this, 'prestamos')">Préstamos</button>
+                <button class="tab-btn" onclick="switchTab(this, 'inversiones')">Inversiones</button>
+            </div>
+
+            <div class="cards-scroll-wrapper" id="cards-wrapper">
+                
+                <article class="account-card">
+                    <div class="card-top">
+                        <div>
+                            <div class="account-name">JULIANA</div>
+                            <div class="account-number">******298</div>
+                        </div>
+                        <div class="fav-badge">
+                            <span class="fav-star">★</span> Cta. favorita
+                        </div>
+                    </div>
+                    <div class="account-type">Cuenta Transaccional</div>
+                    <div class="card-middle">
+                        <div class="label-balance">Saldo disponible</div>
+                        <div class="balance-row">
+                            <span class="balance-amount hidden-state" id="balance-1">$ 1,250.00</span>
+                            <span class="balance-hidden visible-state" id="hidden-1">$ *.**</span>
+                            <button class="btn-toggle-eye" onclick="toggleBalance('1', this)">
+                                <svg class="eye-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="account-card">
+                    <div class="card-top">
+                        <div>
+                            <div class="account-name">AHO. FLEXIBLE</div>
+                            <div class="account-number">******381</div>
+                        </div>
+                    </div>
+                    <div class="account-type">Cuenta Ahorros</div>
+                    <div class="card-middle">
+                        <div class="label-balance">Saldo disponible</div>
+                        <div class="balance-row">
+                            <span class="balance-amount hidden-state" id="balance-2">$ 450.50</span>
+                            <span class="balance-hidden visible-state" id="hidden-2">$ *.**</span>
+                            <button class="btn-toggle-eye" onclick="toggleBalance('2', this)">
+                                <svg class="eye-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <section style="margin-top: 25px;">
+            <h2 class="section-title" style="padding: 0 var(--spacing-container); margin-bottom: 15px; font-size: 1.1rem;">¿Qué quieres hacer?</h2>
             
-            <div class="rating-input">
-                <div class="rating-stars">
-                    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 estrellas">★</label>
-                    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 estrellas">★</label>
-                    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 estrellas">★</label>
-                    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 estrellas">★</label>
-                    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 estrella">★</label>
+            <div class="actions-grid">
+                <div class="action-card" onclick="showAlert('Iniciar Transferencia')">
+                    <div class="action-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm-1-11v4h2v-4h3l-4-4-4 4h3z" opacity="0.2"/><path d="M4 12c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8-8 3.58-8 8zm2 0c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z"/><path d="M8 12l4-4 4 4h-3v4h-2v-4z"/></svg>
+                    </div>
+                    <span class="action-text">Transferir dinero</span>
                 </div>
-                <textarea id="comment-text" placeholder="Deja tu comentario sobre la app (Máx. 150 caracteres)..." maxlength="150"></textarea>
-                <button id="submit-comment">Enviar Comentario y Voto Anónimo</button>
+
+                <div class="action-card" onclick="showAlert('Pagar Servicios')">
+                    <div class="action-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#F4D03F"/><path d="M9 20h6v2H9z" opacity="0.3"/></svg>
+                    </div>
+                    <span class="action-text">Pagar servicios</span>
+                </div>
+
+                <div class="action-card" onclick="showAlert('Pagar Tarjetas')">
+                    <div class="action-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm-1 14H5v-5h14v5zm0-9H5V6h14v3z"/></svg>
+                    </div>
+                    <span class="action-text">Pagar tarjetas</span>
+                </div>
+
+                <div class="action-card" onclick="showAlert('Retiro sin tarjeta')">
+                    <div class="action-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z"/><rect x="10" y="16" width="4" height="2"/></svg>
+                    </div>
+                    <span class="action-text">Retirar sin tarjeta</span>
+                </div>
+
+                <div class="action-card" onclick="showAlert('Recargar Celular')">
+                    <div class="action-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                    </div>
+                    <span class="action-text">Recargar celular</span>
+                </div>
+
+                <div class="action-card deuna" onclick="showAlert('Abrir QR Deuna!')">
+                    <div class="badge-new">Nuevo</div>
+                    <div class="deuna-logo">d!</div>
+                    <span class="action-text">Pagar a un QR Deuna</span>
+                </div>
             </div>
-            
-            <div id="comments-list">
-                <p style="color:#aaa; text-align:center;">Cargando comentarios...</p>
-            </div>
-        </div>
-        
-        <div class="version">
-            ⚠️ Es posible que veas una advertencia de seguridad. Debes permitir la instalación de fuentes desconocidas.
-        </div>
+        </section>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="navTo(this)">
+                <div class="btn-home-indicator nav-icon">
+                   <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </div>
+                <span class="nav-text">Inicio</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navTo(this)">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V6h11v5zM20 6h-4v4h4V6z"/></svg>
+                </div>
+                <span class="nav-text">Mis productos</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navTo(this)">
+                <div class="nav-icon">
+                     <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                </div>
+                <span class="nav-text">Solicitudes</span>
+            </a>
+            <a href="#" class="nav-item" onclick="navTo(this)">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <span class="nav-text">Perfil</span>
+            </a>
+        </nav>
+
     </div>
-    
-    <div id="security-check-modal">
-        <div class="security-check-content">
-            <div class="security-check-spinner"></div>
-            <div class="security-message" id="security-message-text">Comprobando seguridad del archivo...</div>
-        </div>
-    </div>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // === CONFIGURACIÓN DE FIREBASE (ACTUALIZA ESTOS VALORES) ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyCF5lyEIFkKhzgc4kOMebWZ7oZrxWDNw2Y", 
-            authDomain: "app-aeff2.firebaseapp.com",
-            projectId: "app-aeff2",
-        };
+        /**
+         * LÓGICA JAVASCRIPT
+         * Vanilla JS optimizado.
+         */
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        const FieldValue = firebase.firestore.FieldValue;
+        // Estado inicial de visibilidad de saldo (falso = oculto)
+        let isBalanceVisible = false;
 
-        // --- Elementos del DOM ---
-        const downloadCounterElement = document.getElementById('download-counter');
-        const downloadButton = document.getElementById('btn-download');
-        const avgRatingElement = document.getElementById('average-rating');
-        const starDisplayElement = document.getElementById('star-display');
-        const submitButton = document.getElementById('submit-comment');
-        const commentsListElement = document.getElementById('comments-list');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const commentTextarea = document.getElementById('comment-text');
-        const ratingInputs = document.querySelectorAll('input[name="rating"]');
-        const securityModal = document.getElementById('security-check-modal');
-        const securityText = document.getElementById('security-message-text');
+        /**
+         * Función para alternar la visibilidad de los saldos
+         * @param {string} id - Identificador de la tarjeta
+         * @param {HTMLElement} btn - El botón presionado
+         */
+        function toggleBalance(id, btn) {
+            const amountEl = document.getElementById(`balance-${id}`);
+            const hiddenEl = document.getElementById(`hidden-${id}`);
+            const svgEl = btn.querySelector('svg');
 
-        // URL del APK alojado en Render.com (¡CORREGIDA CON EL NOMBRE FINAL!)
-        const APK_URL = "https://github.com/dyla20044-gif/tienda/raw/refs/heads/main/sala%20cine%201.4.apk"; 
-
-        let isInitialized = false;
-        let userUid = null;
-
-        // --- INICIALIZACIÓN Y LÓGICA ANÓNIMA ---
-        auth.signInAnonymously().then(userCredential => {
-            userUid = userCredential.user.uid;
-            isInitialized = true;
-            loadStats();
-            renderComments();
-        }).catch(error => {
-            console.error("Error signing in anonymously:", error);
-            feedbackMessage.textContent = "Error al conectar con la base de datos.";
-        });
-
-
-        // --- ESTADÍSTICAS Y CONTADORES ---
-        async function loadStats() {
-            try {
-                // 1. CARGA EL CONTADOR DE DESCARGAS
-                const downloadsDoc = await db.collection("app_stats").doc("download_counter").get();
-                const totalDownloads = downloadsDoc.exists ? downloadsDoc.data().total || 0 : 0;
-                downloadCounterElement.textContent = totalDownloads.toLocaleString();
-
-                // 2. CARGA LA PUNTUACIÓN PROMEDIO
-                const ratingDoc = await db.collection("app_stats").doc("rating_summary").get();
-                let average = 1.1; // VALOR INICIAL BAJO (1.1)
-                if (ratingDoc.exists) {
-                    const data = ratingDoc.data();
-                    if (data.totalVotes > 0) {
-                        average = (data.totalScore / data.totalVotes);
-                    }
-                }
-                avgRatingElement.textContent = average.toFixed(1);
-                renderStars(average);
-            } catch (error) {
-                console.error("Error al cargar estadísticas:", error);
-                renderStars(1.1);
+            // Toggle lógica visual
+            if (amountEl.style.display === 'none' || !amountEl.style.display) {
+                // MOSTRAR SALDO
+                amountEl.style.display = 'inline-block';
+                hiddenEl.style.display = 'none';
+                // Cambiar icono a "ojo abierto"
+                svgEl.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            } else {
+                // OCULTAR SALDO
+                amountEl.style.display = 'none';
+                hiddenEl.style.display = 'inline-block';
+                // Cambiar icono a "ojo tachado"
+                svgEl.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
             }
         }
 
-        function renderStars(average) {
-            starDisplayElement.innerHTML = '';
-            const fullStars = Math.floor(average);
-            const hasHalfStar = (average * 10) % 10 >= 5; 
-            for (let i = 0; i < 5; i++) {
-                const icon = document.createElement('i');
-                if (i < fullStars) {
-                    icon.className = "fas fa-star";
-                } else if (i === fullStars && hasHalfStar) {
-                    icon.className = "fas fa-star-half-alt";
-                } else {
-                    icon.className = "far fa-star";
-                }
-                starDisplayElement.appendChild(icon);
-            }
-        }
-
-        // --- LÓGICA DE DESCARGA Y SEGURIDAD ---
-        downloadButton.addEventListener('click', async () => {
-            if (!isInitialized || !userUid) return;
-
-            // 1. Mostrar el modal de seguridad
-            securityModal.style.display = 'flex';
-            securityText.textContent = 'Iniciando verificación de seguridad...';
-
-            // 2. Simular la verificación de seguridad (Pasos detallados)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            securityText.textContent = 'Comprobando integridad del archivo...'; 
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            securityText.textContent = 'Escaneando código malicioso...'; 
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            securityText.textContent = 'Validando firma de desarrollador...'; 
-            
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // 3. Actualizar mensaje de éxito y preparar descarga
-            securityText.textContent = '✅ ARCHIVO SEGURO. Procede a la descarga.'; 
-            
-            // 4. Pausa final antes de iniciar la descarga
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // 5. Iniciar descarga (utilizando la URL de tu APK)
-            window.location.href = APK_URL; 
-            
-            // 6. Ocultar modal y contar la descarga
-            securityModal.style.display = 'none';
-            incrementDownloadCount();
+        // Inicializar estado oculto al cargar
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.balance-amount').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.balance-hidden').forEach(el => el.style.display = 'inline-block');
         });
 
-
-        // --- MANEJADORES DE BASE DE DATOS (Rating/Comments) ---
-        
-        async function incrementDownloadCount() {
-            try {
-                const statRef = db.collection("app_stats").doc("download_counter");
-                await db.runTransaction(async (transaction) => {
-                    const statDoc = await transaction.get(statRef);
-                    if (statDoc.exists) {
-                        const newTotal = (statDoc.data().total || 0) + 1;
-                        transaction.update(statRef, { total: newTotal });
-                    } else {
-                        transaction.set(statRef, { total: 1 });
-                    }
-                });
-                loadStats();
-            } catch (error) {
-                console.error("Error al incrementar descargas:", error);
-            }
+        /**
+         * Manejo de Tabs (Pestañas)
+         */
+        function switchTab(btn, category) {
+            // Remover clase activa de todos
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            // Agregar a actual
+            btn.classList.add('active');
+            
+            // Simulación de filtrado (en una app real haría fetch o filtraría array)
+            const wrapper = document.getElementById('cards-wrapper');
+            
+            // Efecto visual simple de recarga
+            wrapper.style.opacity = '0.5';
+            setTimeout(() => {
+                wrapper.style.opacity = '1';
+                // Aquí podrías inyectar HTML diferente según la categoría 'category'
+                // Por ahora mantenemos las tarjetas estáticas como demo visual
+            }, 200);
         }
 
-        submitButton.addEventListener('click', async () => {
-            if (!isInitialized || !userUid) return;
+        /**
+         * Navegación Inferior
+         */
+        function navTo(link) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            link.classList.add('active');
+        }
 
-            const comment = commentTextarea.value.trim();
-            const ratingInput = document.querySelector('input[name="rating"]:checked');
-            const rating = ratingInput ? parseInt(ratingInput.value) : null;
-            
-            if (!rating) { feedbackMessage.textContent = "Por favor, selecciona una puntuación."; return; }
-            if (comment.length < 5) { feedbackMessage.textContent = "El comentario es muy corto."; return; }
-
-            try {
-                const hasVoted = await db.collection("ratings").where("userId", "==", userUid).limit(1).get();
-                if (!hasVoted.empty) {
-                     feedbackMessage.textContent = "Ya has enviado tu voto. ¡Gracias!";
-                     return;
-                }
-
-                // 1. GUARDAR RATING y COMENTARIO (BATCH)
-                const batch = db.batch();
-                batch.set(db.collection("ratings").doc(), { userId: userUid, rating: rating, timestamp: FieldValue.serverTimestamp() });
-                batch.set(db.collection("page_comments").doc(), { userId: userUid, rating: rating, comment: comment, timestamp: FieldValue.serverTimestamp() });
-
-                // 2. ACTUALIZAR ESTADÍSTICAS GLOBALES
-                const summaryRef = db.collection("app_stats").doc("rating_summary");
-                batch.set(summaryRef, {
-                    totalVotes: FieldValue.increment(1),
-                    totalScore: FieldValue.increment(rating)
-                }, { merge: true });
-                
-                await batch.commit();
-
-                feedbackMessage.textContent = "¡Tu voto y comentario han sido enviados!";
-                commentTextarea.value = '';
-                ratingInputs.forEach(input => input.checked = false);
-                renderComments();
-                loadStats(); // Recalcula el promedio
-                
-            } catch (error) {
-                console.error("Error al enviar comentario:", error);
-                feedbackMessage.textContent = "Error al enviar el voto/comentario.";
-            }
-        });
-
-        // 3. RENDERIZAR COMENTARIOS
-        function renderComments() {
-             db.collection("page_comments").orderBy("timestamp", "desc").limit(10).onSnapshot(snapshot => {
-                commentsListElement.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const item = document.createElement('div');
-                    item.className = 'comment-item';
-                    
-                    const userName = "Anónimo " + (data.userId ? data.userId.substring(0, 7) : 'Usuario'); 
-
-                    item.innerHTML = `
-                        <span class="comment-user">${userName} (${data.rating}★):</span> ${data.comment}
-                    `;
-                    commentsListElement.appendChild(item);
-                });
-
-                if (snapshot.empty) {
-                    commentsListElement.innerHTML = '<p style="color:#aaa; text-align:center;">Sé el primero en dejar tu opinión.</p>';
-                }
-            }, error => {
-                console.error("Error real time comments:", error);
-            });
+        /**
+         * Sistema de Alertas (Mockup)
+         */
+        function showAlert(actionName) {
+            // Usamos un timeout pequeño para que se sienta la interacción táctil primero
+            setTimeout(() => {
+                alert(`Navegando a: ${actionName}`);
+            }, 100);
         }
     </script>
 </body>
