@@ -32,7 +32,13 @@
         
         /* Header */
         .header { background-color: var(--bp-white); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-        .logo-img { height: 38px; width: auto; object-fit: contain; }
+        
+        /* CAMBIO AQUÍ: AUMENTÉ EL TAMAÑO DEL LOGO */
+        .logo-img { 
+            height: 65px; /* Antes era 38px, ahora se verá mucho más grande */
+            width: auto; 
+            object-fit: contain; 
+        }
 
         /* Tarjetas */
         .user-greeting { padding: 0 20px; margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary); }
