@@ -6,7 +6,7 @@
     <title>Banca Móvil - Banco Pichincha</title>
     <style>
         /* =========================================
-           ESTILOS (Mantenemos el diseño original)
+           ESTILOS BASE
            ========================================= */
         :root {
             --bp-yellow: #FFDD00;
@@ -145,6 +145,7 @@
                 </div>
             </div>
         </article>
+
     </div>
 
     <section class="actions-section">
@@ -193,10 +194,12 @@
             
             <li class="transaction-item">
                 <div class="t-info">
-                    <div class="t-icon-box bg-out">↑</div>
+                    <div class="t-icon-box bg-out">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    </div>
                     <div class="t-details">
-                        <h4>Transferencia Enviada</h4>
-                        <span>Hoy, 10:45 AM</span>
+                        <h4>Amazon.com US</h4>
+                        <span>02 Feb, 2026</span>
                     </div>
                 </div>
                 <span class="t-amount amount-neg">-$201.00</span>
@@ -204,21 +207,12 @@
 
             <li class="transaction-item">
                 <div class="t-info">
-                    <div class="t-icon-box bg-out">↑</div>
-                    <div class="t-details">
-                        <h4>Pago Tarjeta Crédito</h4>
-                        <span>Ayer, 08:15 PM</span>
+                    <div class="t-icon-box bg-out">
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                     </div>
-                </div>
-                <span class="t-amount amount-neg">-$200.00</span>
-            </li>
-
-            <li class="transaction-item">
-                <div class="t-info">
-                    <div class="t-icon-box bg-out">↑</div>
                     <div class="t-details">
-                        <h4>Retiro Cajero ATM</h4>
-                        <span>24 Ene, 2026</span>
+                        <h4>PayPal *Shein</h4>
+                        <span>01 Feb, 2026</span>
                     </div>
                 </div>
                 <span class="t-amount amount-neg">-$100.00</span>
@@ -226,10 +220,12 @@
 
             <li class="transaction-item">
                 <div class="t-info">
-                    <div class="t-icon-box bg-out">↑</div>
+                    <div class="t-icon-box bg-out">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
                     <div class="t-details">
-                        <h4>Uber Eats</h4>
-                        <span>22 Ene, 2026</span>
+                        <h4>Uber *Trip</h4>
+                        <span>31 Ene, 2026</span>
                     </div>
                 </div>
                 <span class="t-amount amount-neg">-$10.00</span>
@@ -237,10 +233,12 @@
             
             <li class="transaction-item">
                 <div class="t-info">
-                    <div class="t-icon-box bg-out">↑</div>
+                    <div class="t-icon-box bg-out">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </div>
                     <div class="t-details">
-                        <h4>Suscripción Streaming</h4>
-                        <span>20 Ene, 2026</span>
+                        <h4>Netflix.com</h4>
+                        <span>30 Ene, 2026</span>
                     </div>
                 </div>
                 <span class="t-amount amount-neg">-$7.00</span>
@@ -288,9 +286,7 @@
         }
     }
 
-    // SIMULACIÓN DE ACCIONES NORMALES
     function handleStandardAction(name) {
-        // Simplemente mostramos que la acción se inició
         alert(`Iniciando proceso de: ${name}...`);
     }
 
