@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Banca Móvil - Banco Pichincha</title>
+    <title>Banca Móvil - Inicio</title>
     <style>
         /* =========================================
            ESTILOS BASE
@@ -14,14 +14,15 @@
             --bp-blue-dark: #0a1b45;
             --bp-gray-bg: #F4F6F9;
             --bp-white: #FFFFFF;
-            --color-success: #008f39;
+            --color-success: #008f39; /* Verde corporativo */
+            --color-success-bg: #E8F5E9;
             --color-danger: #D32F2F;
             --text-primary: #0F265C;
             --text-secondary: #6B7280;
             --radius-card: 16px;
             --radius-btn: 12px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(15, 38, 92, 0.08);
+            --shadow-sm: 0 2px 4px rgba(15, 38, 92, 0.05);
+            --shadow-md: 0 8px 16px rgba(15, 38, 92, 0.1);
             --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             --nav-height: 70px;
         }
@@ -32,36 +33,86 @@
         
         /* Header */
         .header { background-color: var(--bp-white); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
-        .logo-img { height: 38px; width: auto; object-fit: contain; }
+        .logo-img { height: 32px; width: auto; object-fit: contain; }
+
+        /* Notificación de Cuenta Desbloqueada */
+        .status-banner {
+            background-color: var(--color-success-bg);
+            border-left: 5px solid var(--color-success);
+            padding: 12px 20px;
+            margin: 15px 20px 5px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .status-icon { color: var(--color-success); }
+        .status-text h4 { font-size: 0.9rem; color: var(--color-success); font-weight: 700; margin-bottom: 2px; }
+        .status-text p { font-size: 0.75rem; color: var(--text-primary); }
 
         /* Tarjetas */
-        .user-greeting { padding: 0 20px; margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary); }
-        .user-name { font-size: 1.1rem; color: var(--bp-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .user-greeting { padding: 0 20px; margin-top: 15px; font-size: 0.9rem; color: var(--text-secondary); }
+        .user-name { font-size: 1.1rem; color: var(--bp-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;}
+        
         .cards-carousel { display: flex; overflow-x: auto; padding: 20px; gap: 16px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .cards-carousel::-webkit-scrollbar { display: none; }
-        .product-card { min-width: 90%; background: var(--bp-white); border-radius: var(--radius-card); padding: 24px; box-shadow: var(--shadow-md); scroll-snap-align: center; display: flex; flex-direction: column; justify-content: space-between; height: 190px; border: 1px solid rgba(0,0,0,0.03); }
+        
+        .product-card { 
+            min-width: 90%; 
+            background: var(--bp-white); 
+            border-radius: var(--radius-card); 
+            padding: 24px; 
+            box-shadow: var(--shadow-md); 
+            scroll-snap-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            height: 190px; 
+            border: 1px solid rgba(0,0,0,0.03); 
+            position: relative;
+            overflow: hidden;
+        }
+        /* Decoración sutil en la tarjeta */
+        .product-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, transparent 50%, rgba(255, 221, 0, 0.1) 50%);
+            border-top-right-radius: var(--radius-card);
+        }
+
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .account-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
         .account-number { font-size: 1rem; letter-spacing: 1px; color: var(--text-primary); font-family: monospace; }
+        
         .card-balance-area { margin-top: auto; }
         .balance-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; }
         .balance-row { display: flex; align-items: center; justify-content: space-between; }
-        .amount { font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+        .amount { font-size: 2.2rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
         .amount.hidden-val { font-size: 1.5rem; letter-spacing: 4px; margin-top: 5px; }
-        .eye-btn { background: none; border: none; cursor: pointer; color: var(--bp-blue); padding: 8px; border-radius: 50%; }
-        .card-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 12px; font-weight: 700; text-transform: uppercase; }
+        .eye-btn { background: none; border: none; cursor: pointer; color: var(--bp-blue); padding: 8px; border-radius: 50%; transition: background 0.2s; }
+        .eye-btn:active { background-color: #f0f0f0; }
+
+        .card-badge { font-size: 0.7rem; padding: 5px 10px; border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-main { background-color: #FFF9C4; color: #F57F17; }
         .badge-credit { background-color: #E3F2FD; color: #1565C0; }
 
         /* Acciones */
-        .actions-section { padding: 10px 20px; }
+        .actions-section { padding: 5px 20px; }
         .section-title { font-size: 1.1rem; font-weight: 700; color: var(--bp-blue); margin-bottom: 16px; }
         .actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         .action-btn { background: var(--bp-white); border: none; border-radius: var(--radius-btn); padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.2s; height: 110px; }
         .action-btn:active { transform: scale(0.96); background-color: #fafafa; }
-        .action-icon { width: 36px; height: 36px; fill: var(--bp-blue); }
-        .action-text { font-size: 0.8rem; font-weight: 600; text-align: center; line-height: 1.2; color: var(--bp-blue); }
-        .deuna-btn { border: 2px solid var(--bp-yellow); }
+        .action-icon { width: 32px; height: 32px; fill: var(--bp-blue); }
+        .action-text { font-size: 0.75rem; font-weight: 600; text-align: center; line-height: 1.2; color: var(--bp-blue); }
+        .deuna-btn { border: 2px solid var(--bp-yellow); background: linear-gradient(to bottom right, #fff, #fffeea); }
         .deuna-logo { font-weight: 900; color: #4B0082; font-size: 1.4rem; font-style: italic; }
 
         /* Historial */
@@ -72,16 +123,16 @@
         .t-info { display: flex; align-items: center; gap: 12px; }
         .t-icon-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
         .bg-in { background-color: #E8F5E9; color: var(--color-success); }
-        .bg-out { background-color: #FFEBEE; color: var(--color-danger); } /* Rojo para salidas */
-        .t-details h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+        .bg-out { background-color: #FFEBEE; color: var(--color-danger); }
+        .t-details h4 { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
         .t-details span { font-size: 0.75rem; color: var(--text-secondary); }
-        .t-amount { font-weight: 700; font-size: 1rem; }
+        .t-amount { font-weight: 700; font-size: 0.95rem; }
         .amount-pos { color: var(--color-success); }
-        .amount-neg { color: var(--color-danger); } /* Rojo para montos */
+        .amount-neg { color: var(--color-danger); }
 
         /* Nav */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bp-white); height: var(--nav-height); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 200; max-width: 480px; margin: 0 auto; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; flex: 1; height: 100%; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; flex: 1; height: 100%; cursor: pointer; transition: color 0.2s; }
         .nav-item.active { color: var(--bp-blue); }
         .nav-icon svg { width: 24px; height: 24px; fill: currentColor; }
         .nav-text { font-size: 0.7rem; margin-top: 4px; font-weight: 600; }
@@ -101,6 +152,16 @@
         </div>
     </header>
 
+    <div class="status-banner">
+        <div class="status-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <div class="status-text">
+            <h4>Cuenta Desbloqueada</h4>
+            <p>Tu cuenta se encuentra activa y segura.</p>
+        </div>
+    </div>
+
     <div class="user-greeting">
         <p>Hola,</p>
         <p class="user-name">Narváez Ordóñez Wilmer Lenin</p>
@@ -119,7 +180,7 @@
             <div class="card-balance-area">
                 <div class="balance-label">Saldo disponible</div>
                 <div class="balance-row">
-                    <span class="amount" data-balance="3.13">$ 3.13</span>
+                    <span class="amount" data-balance="5,000.00">$ 5,000.00</span>
                     <button class="eye-btn" onclick="toggleVisibility(this)">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
@@ -138,7 +199,7 @@
             <div class="card-balance-area">
                 <div class="balance-label">Disponible</div>
                 <div class="balance-row">
-                    <span class="amount" data-balance="150.00">$ 150.00</span>
+                    <span class="amount" data-balance="500.00">$ 500.00</span>
                     <button class="eye-btn" onclick="toggleVisibility(this)">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
@@ -187,7 +248,7 @@
     <section class="history-section">
         <div class="history-header">
             <h2 class="section-title" style="margin:0;">Últimos movimientos</h2>
-            <a href="#" style="color:#007ACC; text-decoration:none; font-size:0.85rem; font-weight:600;">Ver todos</a>
+            <a href="#" style="color:#0F265C; text-decoration:none; font-size:0.85rem; font-weight:600;">Ver todos</a>
         </div>
 
         <ul class="transaction-list">
@@ -269,6 +330,7 @@
 </div>
 
 <script>
+    // Se ha ajustado la lógica para mostrar los nuevos saldos correctamente al alternar el ojo
     function toggleVisibility(btn) {
         const row = btn.parentElement;
         const amountSpan = row.querySelector('.amount');
@@ -278,22 +340,26 @@
         if (!amountSpan.classList.contains('hidden-val')) {
             amountSpan.classList.add('hidden-val');
             amountSpan.innerText = '$ *****';
+            // Icono de ojo tachado
             icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
         } else {
             amountSpan.classList.remove('hidden-val');
             amountSpan.innerText = '$ ' + realValue;
+            // Icono de ojo normal
             icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
         }
     }
 
     function handleStandardAction(name) {
-        alert(`Iniciando proceso de: ${name}...`);
+        // Alerta simulada para fines educativos
+        alert(`Acción seleccionada: ${name}`);
     }
 
     function switchTab(el) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
         const container = document.querySelector('.cards-carousel');
+        // Efecto visual simple al cambiar de tab
         container.style.opacity = '0.5';
         setTimeout(() => {
             container.style.opacity = '1';
@@ -301,8 +367,11 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+        // Asegurarse de que los estados iniciales sean correctos
         const eyes = document.querySelectorAll('.eye-btn');
-        eyes.forEach(btn => toggleVisibility(btn));
+        // Opcional: Si quieres que arranquen ocultos, descomenta la siguiente línea:
+        // eyes.forEach(btn => toggleVisibility(btn));
+        
         document.querySelector('.cards-carousel').scrollLeft = 0;
     });
 </script>
