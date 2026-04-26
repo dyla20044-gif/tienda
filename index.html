@@ -3,555 +3,600 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Trading Simulado</title>
+    <title>Plataforma de Inversión Pro</title>
     <style>
+        /* Variables de Tema TradingView */
         :root {
-            --bg-dark: #0b0e11;
-            --bg-panel: #1e2329;
-            --bg-input: #2b3139;
-            --text-main: #eaecef;
-            --text-muted: #848e9c;
-            --color-up: #0ecb81;
-            --color-up-bg: rgba(14, 203, 129, 0.1);
-            --color-down: #f6465d;
-            --color-down-bg: rgba(246, 70, 93, 0.1);
-            --color-brand: #fcd535;
-            --color-brand-hover: #e0bd2e;
-            --border-color: #2b3139;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg-base: #131722;
+            --bg-panel: #1e222d;
+            --bg-hover: #2a2e39;
+            --text-main: #d1d4dc;
+            --text-muted: #787b86;
+            --accent: #2962ff;
+            --accent-hover: #1e53e5;
+            --profit: #089981;
+            --profit-bg: rgba(8, 153, 129, 0.15);
+            --loss: #f23645;
+            --loss-bg: rgba(242, 54, 69, 0.15);
+            --border: #2b3139;
+            --font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: var(--font-family);
-            background-color: var(--bg-dark);
+            background-color: var(--bg-base);
             color: var(--text-main);
-            line-height: 1.6;
-        }
-
-        /* Utilidades de texto */
-        .text-up { color: var(--color-up); }
-        .text-down { color: var(--color-down); }
-        .text-muted { color: var(--text-muted); }
-        .font-bold { font-weight: bold; }
-
-        /* Layout */
-        header {
-            background-color: var(--bg-panel);
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border-color);
+            height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .header-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--color-brand);
+        /* Utilidades */
+        .text-profit { color: var(--profit); }
+        .text-loss { color: var(--loss); }
+        .flex { display: flex; }
+        .space-between { justify-content: space-between; align-items: center; }
+        .hidden { display: none !important; }
+
+        /* Top Bar Bancos */
+        .bank-bar {
+            background-color: #0b0e11;
+            padding: 8px 20px;
+            display: flex;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Paneles */
-        .panel {
+        .bank-pill {
             background-color: var(--bg-panel);
-            border-radius: 8px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .panel-title {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* Dashboard Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background-color: var(--bg-input);
-            padding: 1rem;
-            border-radius: 6px;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
+            border: 1px solid var(--border);
             color: var(--text-muted);
-            margin-bottom: 0.3rem;
-        }
-
-        .stat-value {
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-
-        /* Formularios */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--color-brand);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .btn-primary {
-            background-color: var(--color-brand);
-            color: var(--bg-dark);
-        }
+        .bank-pill:hover { background-color: var(--bg-hover); color: white; }
 
-        .btn-primary:hover {
-            background-color: var(--color-brand-hover);
-        }
-
-        .btn-danger {
-            background-color: var(--color-down);
-            color: white;
-            padding: 0.5rem;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--text-muted);
-            color: var(--text-muted);
-            margin-top: 1rem;
-        }
-
-        .btn-outline:hover {
-            background-color: var(--bg-input);
-            color: var(--text-main);
-        }
-
-        /* Tabla de inversiones */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 1rem;
-            text-align: right;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            color: var(--text-muted);
-            font-weight: normal;
-            font-size: 0.9rem;
-        }
-
-        th:first-child, td:first-child { text-align: left; }
-        th:nth-child(2), td:nth-child(2) { text-align: left; }
-
-        tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        tbody tr:hover {
-            background-color: var(--bg-input);
-        }
-
-        /* Animaciones del mercado */
-        @keyframes flashGreen {
-            0% { background-color: transparent; }
-            50% { background-color: var(--color-up-bg); }
-            100% { background-color: transparent; }
-        }
-
-        @keyframes flashRed {
-            0% { background-color: transparent; }
-            50% { background-color: var(--color-down-bg); }
-            100% { background-color: transparent; }
-        }
-
-        .flash-up { animation: flashGreen 1s ease; }
-        .flash-down { animation: flashRed 1s ease; }
-
-        /* Modal Saldo Inicial */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal {
+        /* Header Perfil */
+        header {
             background-color: var(--bg-panel);
-            padding: 2rem;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid var(--border-color);
+            padding: 15px 24px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .hidden { display: none !important; }
+        .profile-string {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+        }
+
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
+        .stat-value { font-size: 1.2rem; font-weight: bold; }
+
+        /* Layout Principal */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Formularios y Botones */
+        .panel-title { font-size: 1rem; color: white; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
+        .form-control {
+            width: 100%; padding: 10px;
+            background-color: var(--bg-base); border: 1px solid var(--border);
+            color: white; border-radius: 4px; font-family: inherit;
+        }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 4px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; color: white;
+        }
+        .btn-primary { background-color: var(--accent); }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-buy { background-color: var(--profit); }
+        .btn-sell { background-color: var(--loss); }
+
+        /* Tabla de Posiciones */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+        th { color: var(--text-muted); font-weight: normal; font-size: 0.85rem; }
+        th:first-child, td:first-child { text-align: left; }
+        
+        tbody tr { cursor: pointer; transition: background 0.2s; }
+        tbody tr:hover { background-color: var(--bg-panel); }
+
+        /* Barra de Progreso */
+        .progress-wrapper { background-color: var(--bg-base); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .progress-bar { height: 100%; background-color: var(--accent); width: 0%; transition: width 1s linear; }
+
+        /* Modal y Canvas */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(19, 23, 34, 0.9);
+            display: flex; justify-content: center; align-items: center; z-index: 100;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-panel); border: 1px solid var(--border);
+            border-radius: 8px; width: 900px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .modal-body { display: flex; height: 400px; }
+        
+        .chart-container { flex: 1; padding: 20px; position: relative; }
+        canvas { width: 100%; height: 100%; cursor: crosshair; }
+        
+        .trade-panel { width: 250px; border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+        .close-btn:hover { color: white; }
+
+        /* Modal Inicio */
+        .init-modal { width: 400px; padding: 30px; }
     </style>
 </head>
 <body>
 
-    <div id="initModal" class="modal-overlay hidden">
-        <div class="modal">
-            <h2 class="panel-title" style="margin-bottom: 1rem;">Configuración de Cuenta</h2>
-            <p class="text-muted" style="margin-bottom: 1.5rem;">Establece el saldo inicial para comenzar a operar.</p>
-            <div class="form-group">
-                <label for="initBalance">Saldo Inicial (USD)</label>
-                <input type="number" id="initBalance" class="form-control" value="500" min="10" step="10">
-            </div>
-            <button onclick="setInitialBalance()" class="btn btn-primary">Iniciar Simulación</button>
-        </div>
+    <div class="bank-bar">
+        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco Pichincha...')">🏛 Banco Pichincha</div>
+        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco Guayaquil...')">🏛 Banco Guayaquil</div>
+        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco del Austro...')">🏛 Banco del Austro</div>
+        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco de Machala...')">🏛 Banco de Machala</div>
+        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco del Ecuador...')">🏛 Banco del Ecuador</div>
     </div>
 
     <header>
-        <div class="header-title">⚡ TradeSim Pro</div>
-        <div>Estado: <span class="text-up font-bold">● Mercado Activo</span></div>
+        <div id="ui-profile-string" class="profile-string">Cargando perfil...</div>
+        <div class="header-stats">
+            <div class="stat-box">
+                <span class="stat-label">Capital Total</span>
+                <span class="stat-value" id="ui-total-balance">$0.00</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Capital Invertido</span>
+                <span class="stat-value" id="ui-invested">$0.00</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Rendimiento Actual</span>
+                <span class="stat-value" id="ui-global-pnl">$0.00</span>
+            </div>
+        </div>
     </header>
 
-    <div class="container">
-        <aside>
-            <div class="panel" style="margin-bottom: 2rem;">
-                <h2 class="panel-title">Resumen Financiero</h2>
-                <div class="stats-grid">
-                    <div class="stat-card" style="grid-column: span 2;">
-                        <div class="stat-label">Balance Total</div>
-                        <div class="stat-value" id="ui-total-balance">$0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Disponible</div>
-                        <div class="stat-value" id="ui-available">$0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Invertido</div>
-                        <div class="stat-value" id="ui-invested">$0.00</div>
-                    </div>
-                    <div class="stat-card" style="grid-column: span 2;">
-                        <div class="stat-label">Ganancia / Pérdida Global</div>
-                        <div class="stat-value" id="ui-global-pnl">$0.00</div>
-                    </div>
-                </div>
-                <button onclick="resetAll()" class="btn btn-outline">Reiniciar Cuenta Completa</button>
+    <div class="main-container">
+        <aside class="sidebar">
+            <h2 class="panel-title">Nueva Inversión</h2>
+            <div class="form-group">
+                <label>Activo Financiero</label>
+                <select id="newAsset" class="form-control">
+                    <option value="S&P 500">Índice S&P 500</option>
+                    <option value="NASDAQ">NASDAQ 100</option>
+                    <option value="BTC/USDT">Bitcoin (BTC/USDT)</option>
+                    <option value="EUR/USD">Divisa (EUR/USD)</option>
+                    <option value="XAU/USD">Oro (XAU/USD)</option>
+                </select>
             </div>
-
-            <div class="panel">
-                <h2 class="panel-title">Abrir Nueva Operación</h2>
-                <div class="form-group">
-                    <label for="invName">Nombre del Inversor</label>
-                    <input type="text" id="invName" class="form-control" placeholder="Ej: Juan Pérez">
-                </div>
-                <div class="form-group">
-                    <label for="invAsset">Activo</label>
-                    <select id="invAsset" class="form-control">
-                        <option value="BTC/USD">Bitcoin (BTC/USD)</option>
-                        <option value="ETH/USD">Ethereum (ETH/USD)</option>
-                        <option value="EUR/USD">Forex (EUR/USD)</option>
-                        <option value="XAU/USD">Oro (XAU/USD)</option>
-                        <option value="AAPL">Apple Inc. (AAPL)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="invAmount">Monto a Invertir (USD)</label>
-                    <input type="number" id="invAmount" class="form-control" placeholder="0.00" min="1">
-                </div>
-                <button onclick="createInvestment()" class="btn btn-primary">Ejecutar Compra</button>
+            <div class="form-group">
+                <label>Monto (USD)</label>
+                <input type="number" id="newAmount" class="form-control" placeholder="Ej: 500">
             </div>
+            <div class="form-group">
+                <label>Plazo Estimado (Meses)</label>
+                <input type="number" id="newDuration" class="form-control" value="2" min="1" max="60">
+            </div>
+            <button class="btn btn-primary" onclick="app.executeTrade()">Abrir Posición</button>
         </aside>
 
-        <main>
-            <div class="panel" style="min-height: 600px;">
-                <h2 class="panel-title">Posiciones Activas</h2>
-                <div style="overflow-x: auto;">
-                    <table id="investmentsTable">
-                        <thead>
-                            <tr>
-                                <th>Inversor</th>
-                                <th>Activo</th>
-                                <th>Inversión Inicial</th>
-                                <th>Valor Actual</th>
-                                <th>Beneficio ($)</th>
-                                <th>Beneficio (%)</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            </tbody>
-                    </table>
-                    <div id="emptyState" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                        No hay operaciones activas. Abre una nueva posición para comenzar.
-                    </div>
-                </div>
-            </div>
+        <main class="content">
+            <h2 class="panel-title">Posiciones Activas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Inversión</th>
+                        <th>Valor Actual</th>
+                        <th>Progreso del Plazo</th>
+                        <th>P/L ($)</th>
+                        <th>P/L (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="positionsTable">
+                    </tbody>
+            </table>
         </main>
     </div>
 
+    <div id="initModal" class="modal-overlay">
+        <div class="modal-content init-modal">
+            <h2 class="panel-title" style="margin-bottom: 20px;">Configuración del Perfil</h2>
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="initName" class="form-control" value="Dylan" placeholder="Ej: Narváez Ordoñez, Wilmer Lenin">
+            </div>
+            <div class="form-group">
+                <label>Ubicación</label>
+                <input type="text" id="initLocation" class="form-control" value="Ecuador, Zaruma">
+            </div>
+            <div class="form-group">
+                <label>Capital Inicial (USD)</label>
+                <input type="number" id="initCapital" class="form-control" value="5000">
+            </div>
+            <button class="btn btn-primary" style="margin-top: 10px;" onclick="app.initializeProfile()">Ingresar a la Plataforma</button>
+        </div>
+    </div>
+
+    <div id="tradeModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header space-between">
+                <div>
+                    <span id="modalAsset" style="font-weight: bold; font-size: 1.2rem;">ASSET</span>
+                    <span id="modalCurrentPrice" style="margin-left: 15px; font-variant-numeric: tabular-nums;">$0.00</span>
+                </div>
+                <button class="close-btn" onclick="app.closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-container">
+                    <canvas id="tradingChart"></canvas>
+                </div>
+                <div class="trade-panel">
+                    <div style="flex: 1;">
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Monto en Posición</div>
+                        <div id="modalInvested" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;">$0.00</div>
+                        
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Rendimiento</div>
+                        <div id="modalPnl" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">$0.00</div>
+
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Plazo Configurado</div>
+                        <div id="modalDuration" style="font-size: 0.9rem; color: white;">0 Meses</div>
+                    </div>
+                    
+                    <button class="btn btn-buy" onclick="app.addFundsToPosition()">Comprar Más (+100)</button>
+                    <button class="btn btn-sell" onclick="app.liquidatePosition()">Vender / Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- ESTADO DE LA APLICACIÓN ---
-        let appState = {
-            initialBalance: 0,
-            availableBalance: 0,
-            investments: []
+        // CORE DE LA APLICACIÓN
+        const app = {
+            state: {
+                user: { name: '', location: '', accountType: 'Cuenta de Inversionista' },
+                capital: 0,
+                available: 0,
+                simulatedDays: 0, // 1 tick = 1 día para simular el avance de los meses
+                positions: [],
+                activeDetailId: null
+            },
+            marketInterval: null,
+            chartCtx: null,
+
+            // INICIALIZACIÓN
+            init() {
+                const saved = localStorage.getItem('tradingAppPro');
+                if (saved) {
+                    this.state = JSON.parse(saved);
+                    document.getElementById('initModal').classList.add('hidden');
+                    this.startMarketEngine();
+                }
+                
+                const canvas = document.getElementById('tradingChart');
+                this.chartCtx = canvas.getContext('2d');
+            },
+
+            initializeProfile() {
+                const name = document.getElementById('initName').value || 'Usuario';
+                const loc = document.getElementById('initLocation').value || 'Desconocida';
+                const cap = parseFloat(document.getElementById('initCapital').value) || 1000;
+
+                this.state.user.name = name;
+                this.state.user.location = loc;
+                this.state.capital = cap;
+                this.state.available = cap;
+                this.state.positions = [];
+                this.state.simulatedDays = 0;
+
+                document.getElementById('initModal').classList.add('hidden');
+                this.saveState();
+                this.startMarketEngine();
+            },
+
+            saveState() {
+                localStorage.setItem('tradingAppPro', JSON.stringify(this.state));
+                this.renderUI();
+            },
+
+            // LÓGICA DE TRADING
+            executeTrade() {
+                const asset = document.getElementById('newAsset').value;
+                const amount = parseFloat(document.getElementById('newAmount').value);
+                const months = parseInt(document.getElementById('newDuration').value);
+
+                if (isNaN(amount) || amount <= 0) return alert("Ingresa un monto válido.");
+                if (amount > this.state.available) return alert("Fondos insuficientes.");
+
+                this.state.available -= amount;
+
+                // Crear simulación de precio inicial basada en el activo
+                const basePrice = asset.includes('BTC') ? 65000 : (asset.includes('XAU') ? 2300 : 150);
+
+                const newPosition = {
+                    id: 'POS_' + Date.now(),
+                    asset,
+                    invested: amount,
+                    shares: amount / basePrice,
+                    startPrice: basePrice,
+                    currentPrice: basePrice,
+                    durationMonths: months,
+                    startDay: this.state.simulatedDays,
+                    priceHistory: Array(50).fill(basePrice) // Historial base para el gráfico
+                };
+
+                this.state.positions.push(newPosition);
+                this.saveState();
+                
+                document.getElementById('newAmount').value = '';
+            },
+
+            liquidatePosition() {
+                if (!this.state.activeDetailId) return;
+                const idx = this.state.positions.findIndex(p => p.id === this.state.activeDetailId);
+                if (idx > -1) {
+                    const pos = this.state.positions[idx];
+                    const finalValue = pos.shares * pos.currentPrice;
+                    this.state.available += finalValue;
+                    this.state.positions.splice(idx, 1);
+                    this.closeDetailModal();
+                    this.saveState();
+                }
+            },
+
+            addFundsToPosition() {
+                if (!this.state.activeDetailId) return;
+                const addAmount = 100;
+                if (addAmount > this.state.available) return alert("Fondos insuficientes.");
+                
+                const pos = this.state.positions.find(p => p.id === this.state.activeDetailId);
+                if (pos) {
+                    this.state.available -= addAmount;
+                    pos.invested += addAmount;
+                    pos.shares += addAmount / pos.currentPrice;
+                    this.saveState();
+                }
+            },
+
+            // MOTOR DE SIMULACIÓN DEL MERCADO
+            startMarketEngine() {
+                if (this.marketInterval) clearInterval(this.marketInterval);
+                this.renderUI(); // Render inicial
+
+                this.marketInterval = setInterval(() => {
+                    this.state.simulatedDays += 1; // Avanza el tiempo virtual
+
+                    this.state.positions.forEach(pos => {
+                        // Volatilidad aleatoria tipo Random Walk
+                        const volatility = pos.asset.includes('BTC') ? 0.02 : 0.005; 
+                        const change = 1 + ((Math.random() * volatility * 2) - volatility);
+                        
+                        pos.currentPrice *= change;
+                        
+                        // Actualizar historial para el gráfico (mantener últimos 100 puntos)
+                        pos.priceHistory.push(pos.currentPrice);
+                        if (pos.priceHistory.length > 100) pos.priceHistory.shift();
+                    });
+
+                    this.saveState();
+
+                    // Si el modal está abierto, forzar actualización del gráfico
+                    if (this.state.activeDetailId) {
+                        this.updateDetailModalUI();
+                    }
+                }, 1500); // Actualiza cada 1.5 segundos
+            },
+
+            // RENDERIZADO DE INTERFAZ
+            renderUI() {
+                // Formato Header
+                const profileStr = `${this.state.user.name} - ${this.state.user.accountType} - ${this.state.user.location}`;
+                document.getElementById('ui-profile-string').textContent = profileStr;
+
+                let totalInvested = 0;
+                let currentTotalValue = 0;
+                const tbody = document.getElementById('positionsTable');
+                tbody.innerHTML = '';
+
+                this.state.positions.forEach(pos => {
+                    const currentValue = pos.shares * pos.currentPrice;
+                    const pnl = currentValue - pos.invested;
+                    const pnlPct = (pnl / pos.invested) * 100;
+                    
+                    totalInvested += pos.invested;
+                    currentTotalValue += currentValue;
+
+                    const colorClass = pnl >= 0 ? 'text-profit' : 'text-loss';
+                    const sign = pnl >= 0 ? '+' : '';
+
+                    // Cálculo de progreso del plazo (asumiendo 30 días virtuales por mes)
+                    const targetDays = pos.durationMonths * 30;
+                    const elapsedDays = this.state.simulatedDays - pos.startDay;
+                    const progressPct = Math.min((elapsedDays / targetDays) * 100, 100);
+
+                    const tr = document.createElement('tr');
+                    tr.onclick = () => this.openDetailModal(pos.id);
+                    tr.innerHTML = `
+                        <td style="font-weight: bold;">${pos.asset}</td>
+                        <td>${this.fmtCur(pos.invested)}</td>
+                        <td>${this.fmtCur(currentValue)}</td>
+                        <td style="text-align: left;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${pos.durationMonths} Meses</div>
+                            <div class="progress-wrapper"><div class="progress-bar" style="width: ${progressPct}%"></div></div>
+                        </td>
+                        <td class="${colorClass}">${sign}${this.fmtCur(pnl)}</td>
+                        <td class="${colorClass}">${sign}${pnlPct.toFixed(2)}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                const totalCapital = this.state.available + currentTotalValue;
+                const globalPnl = currentTotalValue - totalInvested;
+
+                document.getElementById('ui-total-balance').textContent = this.fmtCur(totalCapital);
+                document.getElementById('ui-invested').textContent = this.fmtCur(totalInvested);
+                
+                const gPnlEl = document.getElementById('ui-global-pnl');
+                gPnlEl.textContent = `${globalPnl >= 0 ? '+' : ''}${this.fmtCur(globalPnl)}`;
+                gPnlEl.className = 'stat-value ' + (globalPnl >= 0 ? 'text-profit' : 'text-loss');
+            },
+
+            // GESTIÓN DEL MODAL Y GRÁFICOS
+            openDetailModal(id) {
+                this.state.activeDetailId = id;
+                document.getElementById('tradeModal').classList.remove('hidden');
+                this.updateDetailModalUI();
+            },
+
+            closeDetailModal() {
+                this.state.activeDetailId = null;
+                document.getElementById('tradeModal').classList.add('hidden');
+            },
+
+            updateDetailModalUI() {
+                const pos = this.state.positions.find(p => p.id === this.state.activeDetailId);
+                if (!pos) return;
+
+                const currentValue = pos.shares * pos.currentPrice;
+                const pnl = currentValue - pos.invested;
+                const colorClass = pnl >= 0 ? 'text-profit' : 'text-loss';
+
+                document.getElementById('modalAsset').textContent = pos.asset;
+                document.getElementById('modalCurrentPrice').textContent = this.fmtCur(pos.currentPrice);
+                document.getElementById('modalCurrentPrice').className = pos.currentPrice >= pos.startPrice ? 'text-profit' : 'text-loss';
+                
+                document.getElementById('modalInvested').textContent = this.fmtCur(pos.invested);
+                document.getElementById('modalPnl').textContent = `${pnl >= 0 ? '+' : ''}${this.fmtCur(pnl)}`;
+                document.getElementById('modalPnl').className = colorClass;
+                document.getElementById('modalDuration').textContent = `${pos.durationMonths} Meses (Plazo Objetivo)`;
+
+                this.drawCanvasChart(pos);
+            },
+
+            drawCanvasChart(pos) {
+                const canvas = document.getElementById('tradingChart');
+                const container = canvas.parentElement;
+                
+                // Ajustar resolución del canvas
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                
+                const ctx = this.chartCtx;
+                const W = canvas.width;
+                const H = canvas.height;
+                
+                ctx.clearRect(0, 0, W, H);
+
+                const data = pos.priceHistory;
+                if (data.length < 2) return;
+
+                const minPrice = Math.min(...data) * 0.999;
+                const maxPrice = Math.max(...data) * 1.001;
+                const range = maxPrice - minPrice;
+
+                // Color dinámico según tendencia
+                const isUp = data[data.length - 1] >= data[0];
+                const strokeColor = isUp ? '#089981' : '#f23645';
+                const fillColor = isUp ? 'rgba(8, 153, 129, 0.2)' : 'rgba(242, 54, 69, 0.2)';
+
+                ctx.beginPath();
+                ctx.moveTo(0, H); // Inicio inferior izquierdo para rellenar
+
+                data.forEach((price, index) => {
+                    const x = (index / (data.length - 1)) * W;
+                    const y = H - ((price - minPrice) / range) * H;
+                    ctx.lineTo(x, y);
+                });
+
+                ctx.lineTo(W, H); // Fin inferior derecho
+                ctx.closePath();
+
+                // Relleno degradado
+                const gradient = ctx.createLinearGradient(0, 0, 0, H);
+                gradient.addColorStop(0, fillColor);
+                gradient.addColorStop(1, 'rgba(19, 23, 34, 0)');
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Línea de precio
+                ctx.beginPath();
+                data.forEach((price, index) => {
+                    const x = (index / (data.length - 1)) * W;
+                    const y = H - ((price - minPrice) / range) * H;
+                    if (index === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Línea punteada de precio actual
+                const lastY = H - ((data[data.length - 1] - minPrice) / range) * H;
+                ctx.beginPath();
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(0, lastY);
+                ctx.lineTo(W, lastY);
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            },
+
+            // UTILIDADES
+            fmtCur(num) {
+                return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            }
         };
 
-        // --- INICIALIZACIÓN ---
-        function init() {
-            const savedData = localStorage.getItem('tradeSimData');
-            if (savedData) {
-                appState = JSON.parse(savedData);
-                if(appState.initialBalance <= 0) {
-                    showInitModal();
-                } else {
-                    updateUI();
-                }
-            } else {
-                showInitModal();
-            }
-            
-            // Iniciar simulación del mercado cada 1.5 segundos
-            setInterval(simulateMarket, 1500);
-        }
-
-        // --- GESTIÓN DE SALDO INICIAL ---
-        function showInitModal() {
-            document.getElementById('initModal').classList.remove('hidden');
-        }
-
-        function setInitialBalance() {
-            const val = parseFloat(document.getElementById('initBalance').value);
-            if (isNaN(val) || val <= 0) {
-                alert("Por favor ingresa un monto válido mayor a 0.");
-                return;
-            }
-            appState.initialBalance = val;
-            appState.availableBalance = val;
-            appState.investments = [];
-            
-            document.getElementById('initModal').classList.add('hidden');
-            saveData();
-            updateUI();
-        }
-
-        // --- CREAR INVERSIÓN ---
-        function createInvestment() {
-            const name = document.getElementById('invName').value.trim();
-            const asset = document.getElementById('invAsset').value;
-            const amount = parseFloat(document.getElementById('invAmount').value);
-
-            if (!name) return alert("Por favor ingresa el nombre del inversor.");
-            if (isNaN(amount) || amount <= 0) return alert("Ingresa un monto de inversión válido.");
-            if (amount > appState.availableBalance) return alert(`Saldo insuficiente. Tienes $${appState.availableBalance.toFixed(2)} disponibles.`);
-
-            // Deducir del balance disponible
-            appState.availableBalance -= amount;
-
-            // Crear objeto de inversión
-            const newInv = {
-                id: Date.now().toString(),
-                name: name,
-                asset: asset,
-                initialAmount: amount,
-                currentValue: amount, // Empieza valiendo lo mismo
-                pnl: 0,
-                pnlPercent: 0,
-                lastTrend: 'none' // 'up' o 'down' para animaciones
-            };
-
-            appState.investments.push(newInv);
-            
-            // Limpiar formulario
-            document.getElementById('invName').value = '';
-            document.getElementById('invAmount').value = '';
-
-            saveData();
-            updateUI();
-        }
-
-        // --- CERRAR INVERSIÓN ---
-        function closeInvestment(id) {
-            const index = appState.investments.findIndex(inv => inv.id === id);
-            if (index > -1) {
-                const inv = appState.investments[index];
-                // Retornar el valor actual al balance disponible
-                appState.availableBalance += inv.currentValue;
-                // Eliminar del array
-                appState.investments.splice(index, 1);
-                
-                saveData();
-                updateUI();
-            }
-        }
-
-        // --- SIMULADOR DE MERCADO ---
-        function simulateMarket() {
-            if (appState.investments.length === 0) return;
-
-            appState.investments.forEach(inv => {
-                // Volatilidad aleatoria entre -1.5% y +1.5% cada tick
-                const changePercent = (Math.random() * 0.03) - 0.015; 
-                
-                const previousValue = inv.currentValue;
-                inv.currentValue = inv.currentValue * (1 + changePercent);
-                
-                // Calcular ganancias/pérdidas
-                inv.pnl = inv.currentValue - inv.initialAmount;
-                inv.pnlPercent = (inv.pnl / inv.initialAmount) * 100;
-
-                // Determinar tendencia para animación
-                if (inv.currentValue > previousValue) {
-                    inv.lastTrend = 'up';
-                } else if (inv.currentValue < previousValue) {
-                    inv.lastTrend = 'down';
-                }
-            });
-
-            saveData();
-            updateUI(true); // Pasamos true para indicar que es una actualización de mercado (activa animaciones)
-        }
-
-        // --- ACTUALIZACIÓN DE INTERFAZ ---
-        function updateUI(isMarketTick = false) {
-            // Cálculos globales
-            let totalInvested = 0;
-            let totalCurrentValue = 0;
-
-            appState.investments.forEach(inv => {
-                totalInvested += inv.initialAmount;
-                totalCurrentValue += inv.currentValue;
-            });
-
-            const totalBalance = appState.availableBalance + totalCurrentValue;
-            const globalPnl = totalCurrentValue - totalInvested;
-
-            // Actualizar Dashboard
-            document.getElementById('ui-total-balance').textContent = formatCurrency(totalBalance);
-            document.getElementById('ui-available').textContent = formatCurrency(appState.availableBalance);
-            document.getElementById('ui-invested').textContent = formatCurrency(totalInvested);
-            
-            const globalPnlEl = document.getElementById('ui-global-pnl');
-            globalPnlEl.textContent = `${globalPnl >= 0 ? '+' : ''}${formatCurrency(globalPnl)}`;
-            globalPnlEl.className = 'stat-value ' + (globalPnl >= 0 ? 'text-up' : 'text-down');
-
-            // Actualizar Tabla
-            const tbody = document.getElementById('tableBody');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (appState.investments.length === 0) {
-                tbody.innerHTML = '';
-                emptyState.style.display = 'block';
-                return;
-            }
-
-            emptyState.style.display = 'none';
-            let tableHTML = '';
-
-            appState.investments.forEach(inv => {
-                const isProfit = inv.pnl >= 0;
-                const colorClass = isProfit ? 'text-up' : 'text-down';
-                const sign = isProfit ? '+' : '';
-                
-                // Determinar clase de animación solo si viene de un tick del mercado
-                let rowClass = '';
-                if (isMarketTick) {
-                    rowClass = inv.lastTrend === 'up' ? 'flash-up' : (inv.lastTrend === 'down' ? 'flash-down' : '');
-                }
-
-                tableHTML += `
-                    <tr class="${rowClass}">
-                        <td><div class="font-bold">${inv.name}</div></td>
-                        <td>${inv.asset}</td>
-                        <td>${formatCurrency(inv.initialAmount)}</td>
-                        <td class="font-bold">${formatCurrency(inv.currentValue)}</td>
-                        <td class="${colorClass}">${sign}${formatCurrency(inv.pnl)}</td>
-                        <td class="${colorClass}">${sign}${inv.pnlPercent.toFixed(2)}%</td>
-                        <td>
-                            <button onclick="closeInvestment('${inv.id}')" class="btn btn-danger">Cerrar</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = tableHTML;
-        }
-
-        // --- UTILIDADES ---
-        function formatCurrency(num) {
-            return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-        }
-
-        function saveData() {
-            localStorage.setItem('tradeSimData', JSON.stringify(appState));
-        }
-
-        function resetAll() {
-            if(confirm("¿Estás seguro de que quieres borrar todos los datos y reiniciar la cuenta?")) {
-                localStorage.removeItem('tradeSimData');
-                appState = { initialBalance: 0, availableBalance: 0, investments: [] };
-                updateUI();
-                showInitModal();
-            }
-        }
-
-        // --- ARRANCAR APP ---
-        window.onload = init;
+        // Arrancar
+        window.onload = () => app.init();
     </script>
 </body>
 </html>
