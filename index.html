@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Inversión Pro</title>
+    <title>ProTrading Simulator | Plataforma de Inversión Avanzada</title>
     <style>
-        /* Variables de Tema TradingView */
+        /* Diseño Minimalista Oscuro y Profesional */
         :root {
-            --bg-base: #131722;
-            --bg-panel: #1e222d;
-            --bg-hover: #2a2e39;
-            --text-main: #d1d4dc;
-            --text-muted: #787b86;
-            --accent: #2962ff;
-            --accent-hover: #1e53e5;
-            --profit: #089981;
-            --profit-bg: rgba(8, 153, 129, 0.15);
-            --loss: #f23645;
-            --loss-bg: rgba(242, 54, 69, 0.15);
-            --border: #2b3139;
-            --font-family: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif;
+            --bg-base: #0b0f19;
+            --bg-panel: #151b2b;
+            --bg-hover: #1e2638;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --border: #1e293b;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,72 +34,96 @@
             overflow: hidden;
         }
 
-        /* Utilidades */
-        .text-profit { color: var(--profit); }
-        .text-loss { color: var(--loss); }
+        /* Tipografía y Utilidades */
+        .text-profit { color: var(--success); font-weight: 600; }
+        .text-loss { color: var(--danger); font-weight: 600; }
         .flex { display: flex; }
         .space-between { justify-content: space-between; align-items: center; }
         .hidden { display: none !important; }
 
         /* Top Bar Bancos */
         .bank-bar {
-            background-color: #0b0e11;
-            padding: 8px 20px;
+            background-color: #06080d;
+            padding: 10px 24px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
+            align-items: center;
+        }
+
+        .bank-bar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-right: 10px;
         }
 
         .bank-pill {
-            background-color: var(--bg-panel);
+            background-color: transparent;
             border: 1px solid var(--border);
             color: var(--text-muted);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .bank-pill:hover { background-color: var(--bg-hover); color: white; }
+        .bank-pill:hover { 
+            background-color: var(--bg-panel); 
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
 
-        /* Header Perfil */
+        /* Header y Estadísticas */
         header {
             background-color: var(--bg-panel);
-            padding: 15px 24px;
+            padding: 20px 24px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
+        .profile-info { display: flex; flex-direction: column; gap: 5px; }
+        
         .profile-string {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+        
+        .profile-badge {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: white;
+            display: inline-block;
+            width: fit-content;
         }
 
-        .header-stats {
-            display: flex;
-            gap: 30px;
-            margin-top: 10px;
-        }
-
+        .header-stats { display: flex; gap: 30px; align-items: center; }
         .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
-        .stat-value { font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-        /* Layout Principal */
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        /* Controles Principales */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
 
         .sidebar {
-            width: 320px;
-            background-color: var(--bg-panel);
+            width: 340px;
+            background-color: var(--bg-base);
             border-right: 1px solid var(--border);
-            padding: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -108,136 +132,170 @@
 
         .content {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
+            background-color: var(--bg-panel);
             overflow-y: auto;
-            position: relative;
         }
 
         /* Formularios y Botones */
-        .panel-title { font-size: 1rem; color: white; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .panel-title { 
+            font-size: 1.1rem; 
+            color: white; 
+            margin-bottom: 20px; 
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
         .form-control {
-            width: 100%; padding: 10px;
-            background-color: var(--bg-base); border: 1px solid var(--border);
-            color: white; border-radius: 4px; font-family: inherit;
+            width: 100%; padding: 12px;
+            background-color: rgba(0,0,0,0.2); 
+            border: 1px solid var(--border);
+            color: white; border-radius: 6px; font-family: inherit;
+            transition: border 0.3s;
         }
         .form-control:focus { outline: none; border-color: var(--accent); }
 
         .btn {
-            width: 100%; padding: 12px; border: none; border-radius: 4px;
-            font-weight: bold; cursor: pointer; transition: 0.2s; color: white;
+            width: 100%; padding: 12px 16px; border: none; border-radius: 6px;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; color: white;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         .btn-primary { background-color: var(--accent); }
-        .btn-primary:hover { background-color: var(--accent-hover); }
-        .btn-buy { background-color: var(--profit); }
-        .btn-sell { background-color: var(--loss); }
+        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: var(--success-hover); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger-hover); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background-color: var(--bg-hover); }
 
         /* Tabla de Posiciones */
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
-        th { color: var(--text-muted); font-weight: normal; font-size: 0.85rem; }
+        th, td { padding: 16px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+        th { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
         th:first-child, td:first-child { text-align: left; }
         
         tbody tr { cursor: pointer; transition: background 0.2s; }
-        tbody tr:hover { background-color: var(--bg-panel); }
+        tbody tr:hover { background-color: rgba(255,255,255,0.02); }
+
+        .investor-tag { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 4px; }
 
         /* Barra de Progreso */
-        .progress-wrapper { background-color: var(--bg-base); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .progress-wrapper { background-color: rgba(0,0,0,0.3); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 8px; }
         .progress-bar { height: 100%; background-color: var(--accent); width: 0%; transition: width 1s linear; }
 
-        /* Modal y Canvas */
+        /* Modales */
         .modal-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(19, 23, 34, 0.9);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(6, 8, 13, 0.85);
+            backdrop-filter: blur(4px);
             display: flex; justify-content: center; align-items: center; z-index: 100;
         }
         
         .modal-content {
             background-color: var(--bg-panel); border: 1px solid var(--border);
-            border-radius: 8px; width: 900px; max-width: 95%; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column;
+            border-radius: 12px; width: 950px; max-width: 95%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-        .modal-body { display: flex; height: 400px; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background-color: rgba(0,0,0,0.2); }
+        .modal-body { display: flex; height: 450px; }
         
-        .chart-container { flex: 1; padding: 20px; position: relative; }
+        .chart-container { flex: 1; padding: 20px; position: relative; background-color: #0f141e; }
         canvas { width: 100%; height: 100%; cursor: crosshair; }
         
-        .trade-panel { width: 250px; border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .trade-panel { width: 280px; border-left: 1px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 15px; background-color: var(--bg-panel); }
         
-        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; line-height: 1; }
         .close-btn:hover { color: white; }
 
-        /* Modal Inicio */
-        .init-modal { width: 400px; padding: 30px; }
+        .init-modal { width: 450px; padding: 32px; }
     </style>
 </head>
 <body>
 
     <div class="bank-bar">
-        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco Pichincha...')">🏛 Banco Pichincha</div>
-        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco Guayaquil...')">🏛 Banco Guayaquil</div>
-        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco del Austro...')">🏛 Banco del Austro</div>
-        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco de Machala...')">🏛 Banco de Machala</div>
-        <div class="bank-pill" onclick="alert('Conectando con pasarela de Banco del Ecuador...')">🏛 Banco del Ecuador</div>
+        <span class="bank-bar-title">Pasarelas de Pago:</span>
+        <div class="bank-pill" onclick="app.connectBank('Banco Pichincha')">🏦 Banco Pichincha</div>
+        <div class="bank-pill" onclick="app.connectBank('Banco Guayaquil')">🏦 Banco Guayaquil</div>
+        <div class="bank-pill" onclick="app.connectBank('Banco del Austro')">🏦 Banco del Austro</div>
+        <div class="bank-pill" onclick="app.connectBank('Banco de Machala')">🏦 Banco de Machala</div>
+        <div class="bank-pill" onclick="app.connectBank('Produbanco')">🏦 Produbanco</div>
     </div>
 
     <header>
-        <div id="ui-profile-string" class="profile-string">Cargando perfil...</div>
+        <div class="profile-info">
+            <div id="ui-profile-string" class="profile-string">Cargando perfil...</div>
+            <div id="ui-account-type" class="profile-badge">Cuenta de Inversionista</div>
+        </div>
         <div class="header-stats">
             <div class="stat-box">
-                <span class="stat-label">Capital Total</span>
+                <span class="stat-label">Capital Disponible</span>
                 <span class="stat-value" id="ui-total-balance">$0.00</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">Capital Invertido</span>
+                <span class="stat-label">Total Invertido</span>
                 <span class="stat-value" id="ui-invested">$0.00</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">Rendimiento Actual</span>
+                <span class="stat-label">Rendimiento Global</span>
                 <span class="stat-value" id="ui-global-pnl">$0.00</span>
+            </div>
+            <div>
+                <button class="btn btn-success" style="padding: 10px 20px;" onclick="app.withdrawFunds()">💸 Retirar Fondos</button>
             </div>
         </div>
     </header>
 
     <div class="main-container">
         <aside class="sidebar">
-            <h2 class="panel-title">Nueva Inversión</h2>
+            <h2 class="panel-title">⚡ Nueva Inversión</h2>
+            
+            <div class="form-group">
+                <label>Nombre del Inversionista</label>
+                <input type="text" id="newInvestor" class="form-control" placeholder="Ej: Administrador Principal">
+            </div>
+
             <div class="form-group">
                 <label>Activo Financiero</label>
                 <select id="newAsset" class="form-control">
                     <option value="S&P 500">Índice S&P 500</option>
                     <option value="NASDAQ">NASDAQ 100</option>
                     <option value="BTC/USDT">Bitcoin (BTC/USDT)</option>
+                    <option value="ETH/USDT">Ethereum (ETH/USDT)</option>
                     <option value="EUR/USD">Divisa (EUR/USD)</option>
                     <option value="XAU/USD">Oro (XAU/USD)</option>
                 </select>
             </div>
+            
             <div class="form-group">
-                <label>Monto (USD)</label>
-                <input type="number" id="newAmount" class="form-control" placeholder="Ej: 500">
+                <label>Monto de Inversión (USD)</label>
+                <input type="number" id="newAmount" class="form-control" placeholder="Ej: 1500">
             </div>
+            
             <div class="form-group">
-                <label>Plazo Estimado (Meses)</label>
+                <label>Duración Estimada (Meses)</label>
                 <input type="number" id="newDuration" class="form-control" value="2" min="1" max="60">
             </div>
-            <button class="btn btn-primary" onclick="app.executeTrade()">Abrir Posición</button>
+            
+            <button class="btn btn-primary" onclick="app.executeTrade()" style="margin-top: 10px;">Abrir Posición en el Mercado</button>
         </aside>
 
         <main class="content">
-            <h2 class="panel-title">Posiciones Activas</h2>
+            <h2 class="panel-title">📊 Portafolio Activo</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Activo</th>
-                        <th>Inversión</th>
+                        <th>Activo / Inversionista</th>
+                        <th>Inversión Inicial</th>
                         <th>Valor Actual</th>
                         <th>Progreso del Plazo</th>
-                        <th>P/L ($)</th>
-                        <th>P/L (%)</th>
+                        <th>Ganancia/Pérdida ($)</th>
+                        <th>Rendimiento (%)</th>
                     </tr>
                 </thead>
                 <tbody id="positionsTable">
@@ -248,29 +306,42 @@
 
     <div id="initModal" class="modal-overlay">
         <div class="modal-content init-modal">
-            <h2 class="panel-title" style="margin-bottom: 20px;">Configuración del Perfil</h2>
+            <h2 class="panel-title" style="margin-bottom: 25px; font-size: 1.4rem;">Configuración de Cuenta Pro</h2>
+            
             <div class="form-group">
-                <label>Nombre Completo</label>
-                <input type="text" id="initName" class="form-control" value="Dylan" placeholder="Ej: Narváez Ordoñez, Wilmer Lenin">
+                <label>Nombre de la Cuenta / Titular</label>
+                <input type="text" id="initName" class="form-control" value="Dylan">
             </div>
+            
+            <div class="form-group">
+                <label>Tipo de Cuenta</label>
+                <select id="initAccountType" class="form-control">
+                    <option value="Cuenta de Inversionista">Cuenta de Inversionista</option>
+                    <option value="Cuenta Corporativa">Cuenta Corporativa</option>
+                    <option value="Gestor de Fondos">Gestor de Fondos</option>
+                </select>
+            </div>
+            
             <div class="form-group">
                 <label>Ubicación</label>
                 <input type="text" id="initLocation" class="form-control" value="Ecuador, Zaruma">
             </div>
+            
             <div class="form-group">
-                <label>Capital Inicial (USD)</label>
-                <input type="number" id="initCapital" class="form-control" value="5000">
+                <label>Saldo Inicial Configurable (USD)</label>
+                <input type="number" id="initCapital" class="form-control" value="10000" min="1000">
             </div>
-            <button class="btn btn-primary" style="margin-top: 10px;" onclick="app.initializeProfile()">Ingresar a la Plataforma</button>
+            
+            <button class="btn btn-primary" style="margin-top: 15px; padding: 14px;" onclick="app.initializeProfile()">Acceder a la Plataforma</button>
         </div>
     </div>
 
     <div id="tradeModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header space-between">
+            <div class="modal-header">
                 <div>
-                    <span id="modalAsset" style="font-weight: bold; font-size: 1.2rem;">ASSET</span>
-                    <span id="modalCurrentPrice" style="margin-left: 15px; font-variant-numeric: tabular-nums;">$0.00</span>
+                    <span id="modalAsset" style="font-weight: 700; font-size: 1.4rem; color: #fff;">ASSET</span>
+                    <span id="modalCurrentPrice" style="margin-left: 20px; font-variant-numeric: tabular-nums; font-size: 1.2rem;">$0.00</span>
                 </div>
                 <button class="close-btn" onclick="app.closeDetailModal()">&times;</button>
             </div>
@@ -280,44 +351,51 @@
                 </div>
                 <div class="trade-panel">
                     <div style="flex: 1;">
-                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Monto en Posición</div>
-                        <div id="modalInvested" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;">$0.00</div>
-                        
-                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Rendimiento</div>
-                        <div id="modalPnl" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">$0.00</div>
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Inversionista</div>
+                        <div id="modalInvestor" style="font-size: 1rem; color: white; margin-bottom: 15px;">-</div>
 
-                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px;">Plazo Configurado</div>
-                        <div id="modalDuration" style="font-size: 0.9rem; color: white;">0 Meses</div>
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Capital Invertido</div>
+                        <div id="modalInvested" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 15px;">$0.00</div>
+                        
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Rendimiento Generado</div>
+                        <div id="modalPnl" style="font-size: 1.8rem; font-weight: 700; margin-bottom: 20px;">$0.00</div>
+
+                        <div class="text-muted" style="font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Evolución del Plazo</div>
+                        <div id="modalDuration" style="font-size: 0.95rem; color: white; margin-bottom: 5px;">0 / 0 Meses</div>
+                        <div class="progress-wrapper" style="height: 4px; margin-bottom: 20px;">
+                            <div id="modalProgressBar" class="progress-bar" style="width: 0%;"></div>
+                        </div>
                     </div>
                     
-                    <button class="btn btn-buy" onclick="app.addFundsToPosition()">Comprar Más (+100)</button>
-                    <button class="btn btn-sell" onclick="app.liquidatePosition()">Vender / Cerrar</button>
+                    <button class="btn btn-success" onclick="app.addFundsToPosition()">+ Invertir Más ($500)</button>
+                    <button class="btn btn-outline" onclick="app.sellPartial()">Vender 50%</button>
+                    <button class="btn btn-danger" onclick="app.liquidatePosition()">Cerrar Inversión</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // CORE DE LA APLICACIÓN
         const app = {
             state: {
-                user: { name: '', location: '', accountType: 'Cuenta de Inversionista' },
+                user: { name: '', location: '', accountType: '' },
                 capital: 0,
                 available: 0,
-                simulatedDays: 0, // 1 tick = 1 día para simular el avance de los meses
+                simulatedDays: 0, 
                 positions: [],
                 activeDetailId: null
             },
             marketInterval: null,
             chartCtx: null,
 
-            // INICIALIZACIÓN
             init() {
-                const saved = localStorage.getItem('tradingAppPro');
+                const saved = localStorage.getItem('proTradingApp_v2');
                 if (saved) {
                     this.state = JSON.parse(saved);
                     document.getElementById('initModal').classList.add('hidden');
                     this.startMarketEngine();
+                } else {
+                    document.getElementById('initName').value = 'Dylan';
                 }
                 
                 const canvas = document.getElementById('tradingChart');
@@ -326,11 +404,11 @@
 
             initializeProfile() {
                 const name = document.getElementById('initName').value || 'Usuario';
+                const accountType = document.getElementById('initAccountType').value;
                 const loc = document.getElementById('initLocation').value || 'Desconocida';
-                const cap = parseFloat(document.getElementById('initCapital').value) || 1000;
+                const cap = parseFloat(document.getElementById('initCapital').value) || 10000;
 
-                this.state.user.name = name;
-                this.state.user.location = loc;
+                this.state.user = { name, location: loc, accountType };
                 this.state.capital = cap;
                 this.state.available = cap;
                 this.state.positions = [];
@@ -341,27 +419,51 @@
                 this.startMarketEngine();
             },
 
+            connectBank(bankName) {
+                alert(`Iniciando conexión segura con la pasarela de ${bankName}...\nRedirigiendo a entorno de autenticación.`);
+            },
+
+            withdrawFunds() {
+                const amount = prompt(`¿Cuánto deseas retirar?\nSaldo Disponible: ${this.fmtCur(this.state.available)}`);
+                if (!amount) return;
+                const val = parseFloat(amount);
+                if (isNaN(val) || val <= 0) return alert("Monto inválido.");
+                if (val > this.state.available) return alert("Fondos insuficientes para el retiro.");
+                
+                this.state.available -= val;
+                this.state.capital -= val; // Reduce la base para reflejar retiro real
+                this.saveState();
+                alert(`Retiro exitoso de ${this.fmtCur(val)} a su cuenta bancaria enlazada.`);
+            },
+
             saveState() {
-                localStorage.setItem('tradingAppPro', JSON.stringify(this.state));
+                localStorage.setItem('proTradingApp_v2', JSON.stringify(this.state));
                 this.renderUI();
             },
 
-            // LÓGICA DE TRADING
             executeTrade() {
+                const investor = document.getElementById('newInvestor').value || this.state.user.name;
                 const asset = document.getElementById('newAsset').value;
                 const amount = parseFloat(document.getElementById('newAmount').value);
                 const months = parseInt(document.getElementById('newDuration').value);
 
                 if (isNaN(amount) || amount <= 0) return alert("Ingresa un monto válido.");
-                if (amount > this.state.available) return alert("Fondos insuficientes.");
+                if (amount > this.state.available) return alert(`Fondos insuficientes. Disponible: ${this.fmtCur(this.state.available)}`);
 
                 this.state.available -= amount;
 
-                // Crear simulación de precio inicial basada en el activo
-                const basePrice = asset.includes('BTC') ? 65000 : (asset.includes('XAU') ? 2300 : 150);
+                // Precio base simulado
+                let basePrice = 100;
+                if(asset.includes('BTC')) basePrice = 64000;
+                else if(asset.includes('ETH')) basePrice = 3500;
+                else if(asset.includes('XAU')) basePrice = 2350;
+                else if(asset.includes('NASDAQ')) basePrice = 18000;
+                else if(asset.includes('S&P 500')) basePrice = 5200;
+                else if(asset.includes('EUR')) basePrice = 1.08;
 
                 const newPosition = {
                     id: 'POS_' + Date.now(),
+                    investorName: investor,
                     asset,
                     invested: amount,
                     shares: amount / basePrice,
@@ -369,7 +471,7 @@
                     currentPrice: basePrice,
                     durationMonths: months,
                     startDay: this.state.simulatedDays,
-                    priceHistory: Array(50).fill(basePrice) // Historial base para el gráfico
+                    priceHistory: Array(60).fill(basePrice) // Buffer para el gráfico
                 };
 
                 this.state.positions.push(newPosition);
@@ -380,6 +482,8 @@
 
             liquidatePosition() {
                 if (!this.state.activeDetailId) return;
+                if(!confirm("¿Estás seguro de cerrar completamente esta inversión?")) return;
+
                 const idx = this.state.positions.findIndex(p => p.id === this.state.activeDetailId);
                 if (idx > -1) {
                     const pos = this.state.positions[idx];
@@ -391,9 +495,24 @@
                 }
             },
 
+            sellPartial() {
+                if (!this.state.activeDetailId) return;
+                const pos = this.state.positions.find(p => p.id === this.state.activeDetailId);
+                if (pos) {
+                    const sellShares = pos.shares * 0.5; // Vende el 50%
+                    const sellValue = sellShares * pos.currentPrice;
+                    
+                    pos.shares -= sellShares;
+                    pos.invested *= 0.5; // Reducimos la base invertida a la mitad
+                    this.state.available += sellValue;
+                    this.saveState();
+                    alert(`Has vendido el 50% de la posición. Se han acreditado ${this.fmtCur(sellValue)} a tu cuenta.`);
+                }
+            },
+
             addFundsToPosition() {
                 if (!this.state.activeDetailId) return;
-                const addAmount = 100;
+                const addAmount = 500;
                 if (addAmount > this.state.available) return alert("Fondos insuficientes.");
                 
                 const pos = this.state.positions.find(p => p.id === this.state.activeDetailId);
@@ -405,40 +524,36 @@
                 }
             },
 
-            // MOTOR DE SIMULACIÓN DEL MERCADO
             startMarketEngine() {
                 if (this.marketInterval) clearInterval(this.marketInterval);
-                this.renderUI(); // Render inicial
+                this.renderUI();
 
                 this.marketInterval = setInterval(() => {
-                    this.state.simulatedDays += 1; // Avanza el tiempo virtual
+                    this.state.simulatedDays += 1; 
 
                     this.state.positions.forEach(pos => {
-                        // Volatilidad aleatoria tipo Random Walk
-                        const volatility = pos.asset.includes('BTC') ? 0.02 : 0.005; 
-                        const change = 1 + ((Math.random() * volatility * 2) - volatility);
+                        // Generar variaciones de rendimiento (Simulación de ~1% diario de volatilidad)
+                        // Ajustado por tipo de activo para realismo
+                        const baseVolatility = pos.asset.includes('BTC') ? 0.025 : 0.01;
+                        const change = 1 + ((Math.random() * baseVolatility * 2) - baseVolatility);
                         
                         pos.currentPrice *= change;
                         
-                        // Actualizar historial para el gráfico (mantener últimos 100 puntos)
                         pos.priceHistory.push(pos.currentPrice);
-                        if (pos.priceHistory.length > 100) pos.priceHistory.shift();
+                        if (pos.priceHistory.length > 120) pos.priceHistory.shift();
                     });
 
                     this.saveState();
 
-                    // Si el modal está abierto, forzar actualización del gráfico
                     if (this.state.activeDetailId) {
                         this.updateDetailModalUI();
                     }
-                }, 1500); // Actualiza cada 1.5 segundos
+                }, 1500);
             },
 
-            // RENDERIZADO DE INTERFAZ
             renderUI() {
-                // Formato Header
-                const profileStr = `${this.state.user.name} - ${this.state.user.accountType} - ${this.state.user.location}`;
-                document.getElementById('ui-profile-string').textContent = profileStr;
+                document.getElementById('ui-profile-string').textContent = this.state.user.name;
+                document.getElementById('ui-account-type').textContent = `${this.state.user.accountType} | ${this.state.user.location}`;
 
                 let totalInvested = 0;
                 let currentTotalValue = 0;
@@ -456,7 +571,6 @@
                     const colorClass = pnl >= 0 ? 'text-profit' : 'text-loss';
                     const sign = pnl >= 0 ? '+' : '';
 
-                    // Cálculo de progreso del plazo (asumiendo 30 días virtuales por mes)
                     const targetDays = pos.durationMonths * 30;
                     const elapsedDays = this.state.simulatedDays - pos.startDay;
                     const progressPct = Math.min((elapsedDays / targetDays) * 100, 100);
@@ -464,11 +578,14 @@
                     const tr = document.createElement('tr');
                     tr.onclick = () => this.openDetailModal(pos.id);
                     tr.innerHTML = `
-                        <td style="font-weight: bold;">${pos.asset}</td>
+                        <td>
+                            <div style="font-weight: 600; color: white;">${pos.asset}</div>
+                            <span class="investor-tag">👤 ${pos.investorName}</span>
+                        </td>
                         <td>${this.fmtCur(pos.invested)}</td>
                         <td>${this.fmtCur(currentValue)}</td>
-                        <td style="text-align: left;">
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${pos.durationMonths} Meses</div>
+                        <td style="text-align: left; width: 20%;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${(elapsedDays/30).toFixed(1)} de ${pos.durationMonths} Meses</div>
                             <div class="progress-wrapper"><div class="progress-bar" style="width: ${progressPct}%"></div></div>
                         </td>
                         <td class="${colorClass}">${sign}${this.fmtCur(pnl)}</td>
@@ -480,7 +597,7 @@
                 const totalCapital = this.state.available + currentTotalValue;
                 const globalPnl = currentTotalValue - totalInvested;
 
-                document.getElementById('ui-total-balance').textContent = this.fmtCur(totalCapital);
+                document.getElementById('ui-total-balance').textContent = this.fmtCur(this.state.available);
                 document.getElementById('ui-invested').textContent = this.fmtCur(totalInvested);
                 
                 const gPnlEl = document.getElementById('ui-global-pnl');
@@ -488,7 +605,6 @@
                 gPnlEl.className = 'stat-value ' + (globalPnl >= 0 ? 'text-profit' : 'text-loss');
             },
 
-            // GESTIÓN DEL MODAL Y GRÁFICOS
             openDetailModal(id) {
                 this.state.activeDetailId = id;
                 document.getElementById('tradeModal').classList.remove('hidden');
@@ -512,10 +628,20 @@
                 document.getElementById('modalCurrentPrice').textContent = this.fmtCur(pos.currentPrice);
                 document.getElementById('modalCurrentPrice').className = pos.currentPrice >= pos.startPrice ? 'text-profit' : 'text-loss';
                 
+                document.getElementById('modalInvestor').textContent = pos.investorName;
                 document.getElementById('modalInvested').textContent = this.fmtCur(pos.invested);
-                document.getElementById('modalPnl').textContent = `${pnl >= 0 ? '+' : ''}${this.fmtCur(pnl)}`;
+                
+                const pnlPct = (pnl / pos.invested) * 100;
+                document.getElementById('modalPnl').textContent = `${pnl >= 0 ? '+' : ''}${this.fmtCur(pnl)} (${pnlPct.toFixed(2)}%)`;
                 document.getElementById('modalPnl').className = colorClass;
-                document.getElementById('modalDuration').textContent = `${pos.durationMonths} Meses (Plazo Objetivo)`;
+                
+                const elapsedMonths = ((this.state.simulatedDays - pos.startDay) / 30).toFixed(1);
+                document.getElementById('modalDuration').textContent = `${elapsedMonths} / ${pos.durationMonths} Meses`;
+                
+                const targetDays = pos.durationMonths * 30;
+                const elapsedDays = this.state.simulatedDays - pos.startDay;
+                const progressPct = Math.min((elapsedDays / targetDays) * 100, 100);
+                document.getElementById('modalProgressBar').style.width = `${progressPct}%`;
 
                 this.drawCanvasChart(pos);
             },
@@ -524,9 +650,8 @@
                 const canvas = document.getElementById('tradingChart');
                 const container = canvas.parentElement;
                 
-                // Ajustar resolución del canvas
-                canvas.width = container.clientWidth;
-                canvas.height = container.clientHeight;
+                canvas.width = container.clientWidth - 40; 
+                canvas.height = container.clientHeight - 40;
                 
                 const ctx = this.chartCtx;
                 const W = canvas.width;
@@ -534,38 +659,45 @@
                 
                 ctx.clearRect(0, 0, W, H);
 
+                // Dibujar Grid
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1;
+                for(let i=0; i<5; i++){
+                    const y = (H/4) * i;
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+                }
+
                 const data = pos.priceHistory;
                 if (data.length < 2) return;
 
-                const minPrice = Math.min(...data) * 0.999;
-                const maxPrice = Math.max(...data) * 1.001;
+                const minPrice = Math.min(...data) * 0.99;
+                const maxPrice = Math.max(...data) * 1.01;
                 const range = maxPrice - minPrice;
 
-                // Color dinámico según tendencia
                 const isUp = data[data.length - 1] >= data[0];
-                const strokeColor = isUp ? '#089981' : '#f23645';
-                const fillColor = isUp ? 'rgba(8, 153, 129, 0.2)' : 'rgba(242, 54, 69, 0.2)';
+                const strokeColor = isUp ? '#10b981' : '#ef4444';
+                const fillColor = isUp ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
 
+                // Dibujar Área sombreada
                 ctx.beginPath();
-                ctx.moveTo(0, H); // Inicio inferior izquierdo para rellenar
-
+                ctx.moveTo(0, H);
                 data.forEach((price, index) => {
                     const x = (index / (data.length - 1)) * W;
                     const y = H - ((price - minPrice) / range) * H;
                     ctx.lineTo(x, y);
                 });
-
-                ctx.lineTo(W, H); // Fin inferior derecho
+                ctx.lineTo(W, H);
                 ctx.closePath();
 
-                // Relleno degradado
                 const gradient = ctx.createLinearGradient(0, 0, 0, H);
                 gradient.addColorStop(0, fillColor);
-                gradient.addColorStop(1, 'rgba(19, 23, 34, 0)');
+                gradient.addColorStop(1, 'rgba(15, 20, 30, 0)');
                 ctx.fillStyle = gradient;
                 ctx.fill();
 
-                // Línea de precio
+                // Dibujar Línea con resplandor (Glow)
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = strokeColor;
                 ctx.beginPath();
                 data.forEach((price, index) => {
                     const x = (index / (data.length - 1)) * W;
@@ -574,8 +706,9 @@
                     else ctx.lineTo(x, y);
                 });
                 ctx.strokeStyle = strokeColor;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 2.5;
                 ctx.stroke();
+                ctx.shadowBlur = 0; // Reset
 
                 // Línea punteada de precio actual
                 const lastY = H - ((data[data.length - 1] - minPrice) / range) * H;
@@ -589,13 +722,11 @@
                 ctx.setLineDash([]);
             },
 
-            // UTILIDADES
             fmtCur(num) {
-                return '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                return '$' + parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             }
         };
 
-        // Arrancar
         window.onload = () => app.init();
     </script>
 </body>
