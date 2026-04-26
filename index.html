@@ -19,6 +19,7 @@
             --success-bg: rgba(14, 203, 129, 0.15);
             --danger: #f6465d;
             --danger-bg: rgba(246, 70, 93, 0.15);
+            --warning: #f59e0b;
             --border: #232c3f;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -111,7 +112,7 @@
         .form-control {
             width: 100%; padding: 10px; background-color: var(--bg-input); 
             border: 1px solid var(--border); color: white; border-radius: 4px;
-            font-family: inherit; font-size: 0.9rem;
+            font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s;
         }
         .form-control:focus { outline: none; border-color: var(--accent); }
 
@@ -139,6 +140,11 @@
 
         .progress-wrapper { background-color: rgba(0,0,0,0.5); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
         .progress-bar { height: 100%; background-color: var(--accent); width: 0%; transition: width 0.5s; }
+        
+        .investor-badge {
+            background-color: var(--bg-input); padding: 4px 8px; border-radius: 4px;
+            font-size: 0.8rem; border: 1px solid var(--border);
+        }
 
         /* -------------------------------------
            MODAL DE TRADING AVANZADO 
@@ -165,7 +171,7 @@
         /* Zona Izquierda: Gráfico */
         .chart-area { flex: 1; display: flex; flex-direction: column; background-color: #0a0d14; position: relative; }
         .chart-toolbar {
-            padding: 8px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 10px;
+            padding: 8px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center;
         }
         .tf-btn {
             background: none; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
@@ -213,6 +219,10 @@
         .close-btn:hover { color: white; }
 
         .init-modal { width: 400px; height: auto; }
+        
+        .drawing-hint {
+            color: var(--warning); font-size: 0.75rem; display: flex; align-items: center; gap: 5px; margin-left: auto;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +260,12 @@
     <div class="main-container">
         <aside class="sidebar">
             <h2 class="panel-title">Nueva Operación</h2>
+            
+            <div class="form-group">
+                <label>Nombre del Inversionista</label>
+                <input type="text" id="newInvestor" class="form-control" placeholder="Dueño de la inversión (Opcional)">
+            </div>
+            
             <div class="form-group">
                 <label>Activo Financiero</label>
                 <select id="newAsset" class="form-control">
@@ -278,6 +294,7 @@
                 <thead>
                     <tr>
                         <th>Par / Activo</th>
+                        <th style="text-align: left;">Inversionista</th>
                         <th>Inversión</th>
                         <th>Valor Mercado</th>
                         <th>Plazo</th>
@@ -294,7 +311,7 @@
         <div class="modal-content init-modal" style="padding: 30px;">
             <h2 class="panel-title">Configuración Inicial</h2>
             <div class="form-group">
-                <label>Nombre del Titular</label>
+                <label>Nombre del Titular de la Cuenta</label>
                 <input type="text" id="initName" class="form-control" value="Dylan">
             </div>
             <div class="form-group">
@@ -312,6 +329,7 @@
                     <span id="modalAsset" style="font-weight: 700; font-size: 1.5rem; color: #fff;">BTC/USDT</span>
                     <span id="modalCurrentPrice" class="font-mono" style="font-size: 1.4rem; font-weight: 600;">$0.00</span>
                     <span id="modalPriceChange" style="font-size: 0.9rem;">+0.00%</span>
+                    <span class="investor-badge" id="modalInvestorName">Inversionista: -</span>
                 </div>
                 <button class="close-btn" onclick="app.closeDetailModal()">&times;</button>
             </div>
@@ -325,7 +343,10 @@
                         <button class="tf-btn">1H</button>
                         <button class="tf-btn">4H</button>
                         <button class="tf-btn">1D</button>
-                        <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto; align-self: center;">Velas Japonesas Simbólicas</span>
+                        
+                        <div class="drawing-hint">
+                            <span>✏️ Dibuja en el gráfico para trazar simulaciones y proyecciones</span>
+                        </div>
                     </div>
                     <div class="canvas-container">
                         <canvas id="tradingChart"></canvas>
@@ -398,6 +419,8 @@
                                 <input type="number" id="opSL" class="form-control" placeholder="Precio límite abajo">
                             </div>
                             <button class="btn btn-outline" onclick="app.saveLimits()">Guardar Límites de Riesgo</button>
+                            <br><br>
+                            <button class="btn btn-outline" onclick="app.clearDrawings()" style="border-color: var(--danger); color: var(--danger);">Borrar Dibujos del Gráfico</button>
                         </div>
                     </div>
                 </div>
@@ -417,9 +440,10 @@
             },
             marketInterval: null,
             chartCtx: null,
+            currentDrawing: null, // Para los dibujos en el canvas
 
             init() {
-                const saved = localStorage.getItem('proTradingApp_v3');
+                const saved = localStorage.getItem('proTradingApp_v4');
                 if (saved) {
                     this.state = JSON.parse(saved);
                     document.getElementById('initModal').classList.add('hidden');
@@ -427,10 +451,11 @@
                 }
                 const canvas = document.getElementById('tradingChart');
                 this.chartCtx = canvas.getContext('2d');
+                this.setupCanvasDrawing(canvas);
             },
 
             initializeProfile() {
-                this.state.user.name = document.getElementById('initName').value;
+                this.state.user.name = document.getElementById('initName').value || 'Dylan';
                 const cap = parseFloat(document.getElementById('initCapital').value) || 10000;
                 this.state.capital = cap;
                 this.state.available = cap;
@@ -451,13 +476,14 @@
                 }
             },
 
-            save() { localStorage.setItem('proTradingApp_v3', JSON.stringify(this.state)); this.render(); },
+            save() { localStorage.setItem('proTradingApp_v4', JSON.stringify(this.state)); this.render(); },
 
             /* --- OPERACIONES --- */
             executeTrade() {
                 const asset = document.getElementById('newAsset').value;
                 const amount = parseFloat(document.getElementById('newAmount').value);
                 const duration = parseInt(document.getElementById('newDuration').value);
+                const investorName = document.getElementById('newInvestor').value || this.state.user.name;
 
                 if (isNaN(amount) || amount <= 0 || amount > this.state.available) return alert("Monto inválido o fondos insuficientes.");
 
@@ -468,16 +494,18 @@
                 const pos = {
                     id: 'POS_' + Date.now(),
                     asset, duration,
+                    investor: investorName, // Asignación del nombre del inversionista
                     invested: amount, shares: amount / base,
                     startPrice: base, currentPrice: base,
                     startDay: this.state.simulatedDays,
                     tp: null, sl: null,
-                    // OHLC Data para velas
-                    history: Array(50).fill({o: base, h: base, l: base, c: base})
+                    history: Array(50).fill({o: base, h: base, l: base, c: base}),
+                    drawings: [] // Matriz para almacenar los trazos
                 };
 
                 this.state.positions.push(pos);
                 document.getElementById('newAmount').value = '';
+                document.getElementById('newInvestor').value = '';
                 this.save();
             },
 
@@ -571,6 +599,55 @@
                 }, 1500);
             },
 
+            /* --- LÓGICA DE DIBUJO EN CANVAS --- */
+            setupCanvasDrawing(canvas) {
+                let isDrawing = false;
+                
+                const getMousePos = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    return {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                };
+
+                canvas.addEventListener('mousedown', (e) => {
+                    if(!this.state.activeId) return;
+                    isDrawing = true;
+                    this.currentDrawing = [getMousePos(e)];
+                });
+
+                canvas.addEventListener('mousemove', (e) => {
+                    if(!isDrawing || !this.currentDrawing) return;
+                    this.currentDrawing.push(getMousePos(e));
+                    this.drawCandles(this.getPos()); // Redibujar rápido para ver el trazo
+                });
+
+                const stopDrawing = () => {
+                    if(!isDrawing) return;
+                    isDrawing = false;
+                    const p = this.getPos();
+                    if(p && this.currentDrawing) {
+                        if(!p.drawings) p.drawings = [];
+                        p.drawings.push(this.currentDrawing);
+                        this.save();
+                    }
+                    this.currentDrawing = null;
+                };
+
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+            },
+
+            clearDrawings() {
+                const p = this.getPos();
+                if(p) {
+                    p.drawings = [];
+                    this.save();
+                    this.updateModal();
+                }
+            },
+
             /* --- UI RENDER --- */
             render() {
                 document.getElementById('ui-profile-string').textContent = this.state.user.name;
@@ -591,6 +668,7 @@
                     tr.onclick = () => this.openDetailModal(p.id);
                     tr.innerHTML = `
                         <td style="font-weight:bold; color:white;">${p.asset}</td>
+                        <td style="text-align: left;"><span class="investor-badge">${p.investor || this.state.user.name}</span></td>
                         <td class="font-mono">${this.fmtCur(p.invested)}</td>
                         <td class="font-mono">${this.fmtCur(val)}</td>
                         <td>${p.duration} Meses</td>
@@ -643,6 +721,7 @@
 
                 // Cabecera
                 document.getElementById('modalAsset').textContent = p.asset;
+                document.getElementById('modalInvestorName').textContent = `Inv: ${p.investor || this.state.user.name}`;
                 document.getElementById('modalCurrentPrice').textContent = this.fmtCur(p.currentPrice);
                 document.getElementById('modalCurrentPrice').className = 'font-mono ' + (isProf ? 'text-profit' : 'text-loss');
                 document.getElementById('modalPriceChange').textContent = `${isProf?'+':''}${pct.toFixed(2)}%`;
@@ -672,7 +751,7 @@
                 this.drawCandles(p);
             },
 
-            /* --- DIBUJO DE VELAS JAPONESAS --- */
+            /* --- DIBUJO DE VELAS JAPONESAS Y TRAZOS --- */
             drawCandles(p) {
                 const canvas = document.getElementById('tradingChart');
                 const pEl = canvas.parentElement;
@@ -730,6 +809,32 @@
                 ctx.setLineDash([4,4]);
                 ctx.beginPath(); ctx.moveTo(0, lastY); ctx.lineTo(W, lastY); ctx.stroke();
                 ctx.setLineDash([]);
+                
+                // Función auxiliar para dibujar trazos
+                const renderPath = (path) => {
+                    if(!path || path.length < 2) return;
+                    ctx.beginPath();
+                    ctx.moveTo(path[0].x, path[0].y);
+                    for(let i=1; i<path.length; i++) {
+                        ctx.lineTo(path[i].x, path[i].y);
+                    }
+                    ctx.stroke();
+                };
+
+                // Dibujar los trazos guardados (Proyecciones del usuario)
+                ctx.strokeStyle = 'var(--warning)'; // Color dorado para proyecciones
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                if (p.drawings && p.drawings.length > 0) {
+                    p.drawings.forEach(renderPath);
+                }
+
+                // Dibujar el trazo actual en tiempo real
+                if (this.currentDrawing) {
+                    renderPath(this.currentDrawing);
+                }
             },
 
             fmtCur(num) { return '$' + parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
