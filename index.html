@@ -3,844 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProTrading Simulator | Terminal Avanzado</title>
+    <title>NeoBanco - Banca Web Personal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Diseño Minimalista Oscuro - Estilo TradingView / Binance */
+        /* =========================================
+           VARIABLES GLOBALES Y RESET
+           ========================================= */
         :root {
-            --bg-base: #0b0f19;
-            --bg-panel: #151b2b;
-            --bg-hover: #1e2638;
-            --bg-input: #0f141e;
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #0ecb81;
-            --success-bg: rgba(14, 203, 129, 0.15);
-            --danger: #f6465d;
-            --danger-bg: rgba(246, 70, 93, 0.15);
-            --warning: #f59e0b;
-            --border: #232c3f;
-            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+            --primary-color: #0A2540;
+            --secondary-color: #00D4FF;
+            --accent-color: #635BFF;
+            --bg-color: #F6F9FC;
+            --card-bg: #FFFFFF;
+            --text-main: #32325D;
+            --text-muted: #8898AA;
+            --success: #24B47E;
+            --danger: #E34F4F;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-base);
+            background-color: var(--bg-color);
             color: var(--text-main);
-            height: 100vh;
             display: flex;
-            flex-direction: column;
+            height: 100vh;
             overflow: hidden;
         }
 
-        /* Tipografía y Utilidades */
-        .text-profit { color: var(--success); font-weight: 600; }
-        .text-loss { color: var(--danger); font-weight: 600; }
-        .font-mono { font-family: var(--font-mono); }
-        .flex { display: flex; }
-        .space-between { justify-content: space-between; align-items: center; }
-        .hidden { display: none !important; }
-
-        /* Top Bar Bancos */
-        .bank-bar {
-            background-color: #06080d;
-            padding: 8px 24px;
+        /* =========================================
+           SIDEBAR (Menú Lateral)
+           ========================================= */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-color);
+            color: white;
             display: flex;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
+            flex-direction: column;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+            padding: 0 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand i { color: var(--secondary-color); }
+
+        .nav-item {
+            padding: 15px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .nav-item i { width: 20px; text-align: center; }
+
+        .user-info {
+            margin-top: auto;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* =========================================
+           CONTENIDO PRINCIPAL
+           ========================================= */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; }
+        
+        .date-display {
+            color: var(--text-muted);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tarjetas de Resumen */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card.balance-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .card-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-desc { font-size: 13px; opacity: 0.8; }
+
+        .btn-action {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: opacity 0.3s;
+        }
+        .btn-action:hover { opacity: 0.9; }
+
+        /* =========================================
+           TABLA DE TRANSACCIONES
+           ========================================= */
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .bank-bar-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-right: 10px;
+        .transaction-list {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
-        .bank-pill {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+        .tx-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #E6EBF1;
+            transition: background 0.3s;
         }
 
-        .bank-pill:hover { background-color: var(--bg-panel); color: var(--text-main); border-color: var(--text-muted); }
+        .tx-item:hover { background-color: #F8FAFC; }
+        .tx-item:last-child { border-bottom: none; }
 
-        /* Header y Estadísticas */
-        header {
-            background-color: var(--bg-panel);
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
-        .profile-string { font-size: 1.1rem; font-weight: 700; color: #fff; }
-        .profile-badge { background-color: rgba(59, 130, 246, 0.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-top: 5px; display: inline-block; }
-        
-        .header-stats { display: flex; gap: 30px; align-items: center; }
-        .stat-box { display: flex; flex-direction: column; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-        .stat-value { font-size: 1.3rem; font-weight: 700; font-family: var(--font-mono); }
-
-        /* Contenedores Principales */
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-
-        .sidebar {
-            width: 320px; background-color: var(--bg-base);
-            border-right: 1px solid var(--border); padding: 20px;
-            display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
+        .tx-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 20px;
         }
 
-        .content { flex: 1; padding: 20px; background-color: var(--bg-panel); overflow-y: auto; }
+        .icon-card { background: #E3F2FD; color: #1976D2; }
+        .icon-transfer { background: #E8F5E9; color: #388E3C; }
+        .icon-payment { background: #FFF3E0; color: #F57C00; }
 
-        /* Formularios y Botones */
-        .panel-title { font-size: 1.05rem; color: white; margin-bottom: 15px; font-weight: 600; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
-        .form-control {
-            width: 100%; padding: 10px; background-color: var(--bg-input); 
-            border: 1px solid var(--border); color: white; border-radius: 4px;
-            font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s;
-        }
-        .form-control:focus { outline: none; border-color: var(--accent); }
+        .tx-details { flex: 1; }
+        .tx-title { font-weight: 600; margin-bottom: 4px; }
+        .tx-date { font-size: 13px; color: var(--text-muted); }
 
-        .btn {
-            width: 100%; padding: 10px 15px; border: none; border-radius: 4px;
-            font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.2s; color: white;
-            text-align: center; display: inline-block;
-        }
-        .btn-primary { background-color: var(--accent); }
-        .btn-primary:hover { background-color: var(--accent-hover); }
-        .btn-success { background-color: var(--success); }
-        .btn-success:hover { background-color: #0cba76; }
-        .btn-danger { background-color: var(--danger); }
-        .btn-danger:hover { background-color: #df3b50; }
-        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-outline:hover { background-color: var(--bg-hover); }
+        .tx-amount { font-weight: 700; font-size: 16px; }
+        .tx-amount.negative { color: var(--text-main); }
+        .tx-amount.positive { color: var(--success); }
 
-        /* Tabla Principal */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 14px; text-align: right; border-bottom: 1px solid var(--border); }
-        th { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
-        th:first-child, td:first-child { text-align: left; }
-        tbody tr { cursor: pointer; transition: background 0.2s; }
-        tbody tr:hover { background-color: var(--bg-hover); }
-
-        .progress-wrapper { background-color: rgba(0,0,0,0.5); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
-        .progress-bar { height: 100%; background-color: var(--accent); width: 0%; transition: width 0.5s; }
-        
-        .investor-badge {
-            background-color: var(--bg-input); padding: 4px 8px; border-radius: 4px;
-            font-size: 0.8rem; border: 1px solid var(--border);
-        }
-
-        /* -------------------------------------
-           MODAL DE TRADING AVANZADO 
-           ------------------------------------- */
+        /* =========================================
+           MODAL (Nueva Transferencia)
+           ========================================= */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(6, 8, 13, 0.9); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center; z-index: 100;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
         }
-        
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .modal-content {
-            background-color: var(--bg-panel); border: 1px solid var(--border);
-            border-radius: 8px; width: 1100px; max-width: 98%; height: 85vh;
-            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            background: white;
+            width: 400px;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
         }
 
-        .modal-header { 
-            padding: 15px 20px; border-bottom: 1px solid var(--border); 
-            display: flex; justify-content: space-between; align-items: center; background-color: #0b0f19;
-        }
-        
-        .modal-body { display: flex; flex: 1; overflow: hidden; }
-        
-        /* Zona Izquierda: Gráfico */
-        .chart-area { flex: 1; display: flex; flex-direction: column; background-color: #0a0d14; position: relative; }
-        .chart-toolbar {
-            padding: 8px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center;
-        }
-        .tf-btn {
-            background: none; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
-            cursor: pointer; padding: 4px 8px; border-radius: 4px;
-        }
-        .tf-btn.active, .tf-btn:hover { color: var(--accent); background-color: rgba(59, 130, 246, 0.1); }
-        .canvas-container { flex: 1; position: relative; padding: 10px; }
-        canvas { width: 100%; height: 100%; cursor: crosshair; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        /* Zona Derecha: Panel de Operaciones (Scrollable) */
-        .trade-panel {
-            width: 320px; border-left: 1px solid var(--border); background-color: var(--bg-panel);
-            display: flex; flex-direction: column;
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        
-        /* Pestañas */
-        .tabs-header { display: flex; border-bottom: 1px solid var(--border); }
-        .tab-btn {
-            flex: 1; padding: 12px 0; background: none; border: none; border-bottom: 2px solid transparent;
-            color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.9rem;
-        }
-        .tab-btn.active { color: white; border-bottom-color: var(--accent); }
-        
-        .tab-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
 
-        /* Estilos dentro del panel derecho */
-        .data-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.85rem; }
-        .data-label { color: var(--text-muted); }
-        .data-val { font-weight: 600; font-family: var(--font-mono); }
+        .close-btn { cursor: pointer; font-size: 20px; color: var(--text-muted); }
         
-        .metric-card {
-            background-color: var(--bg-base); border: 1px solid var(--border); padding: 12px;
-            border-radius: 6px; margin-bottom: 15px; text-align: center;
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+        .form-group input {
+            width: 100%; padding: 12px;
+            border: 1px solid #E6EBF1;
+            border-radius: 6px;
+            font-size: 16px;
         }
         
-        .divider { height: 1px; background-color: var(--border); margin: 20px 0; }
-        
-        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .input-group input { flex: 1; }
-        .input-group button { width: 100px; }
-
-        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
-        .close-btn:hover { color: white; }
-
-        .init-modal { width: 400px; height: auto; }
-        
-        .drawing-hint {
-            color: var(--warning); font-size: 0.75rem; display: flex; align-items: center; gap: 5px; margin-left: auto;
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
         }
+
+        /* Simulación de vistas */
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.4s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="bank-bar">
-        <span class="bank-bar-title">Pasarelas:</span>
-        <div class="bank-pill" onclick="app.connectBank('Pichincha')">🏛 Banco Pichincha</div>
-        <div class="bank-pill" onclick="app.connectBank('Guayaquil')">🏛 Banco Guayaquil</div>
-        <div class="bank-pill" onclick="app.connectBank('Austro')">🏛 B. del Austro</div>
-        <div class="bank-pill" onclick="app.connectBank('Machala')">🏛 B. de Machala</div>
-    </div>
-
-    <header>
-        <div>
-            <div id="ui-profile-string" class="profile-string">Cargando...</div>
-            <div id="ui-account-type" class="profile-badge">Inversionista Pro</div>
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-building-columns"></i> NeoBanco
         </div>
-        <div class="header-stats">
-            <div class="stat-box">
-                <span class="stat-label">Capital Disponible</span>
-                <span class="stat-value" id="ui-total-balance">$0.00</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">En Posiciones</span>
-                <span class="stat-value" id="ui-invested">$0.00</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">PNL Global</span>
-                <span class="stat-value" id="ui-global-pnl">$0.00</span>
-            </div>
-            <button class="btn btn-outline" style="width: auto;" onclick="app.withdrawFunds()">Retirar</button>
+        
+        <div class="nav-item active" onclick="switchView('resumen', this)">
+            <i class="fa-solid fa-wallet"></i> Resumen
         </div>
-    </header>
+        <div class="nav-item" onclick="switchView('tarjetas', this)">
+            <i class="fa-solid fa-credit-card"></i> Mis Tarjetas
+        </div>
+        <div class="nav-item" onclick="switchView('transferencias', this)">
+            <i class="fa-solid fa-money-bill-transfer"></i> Transferencias
+        </div>
+        <div class="nav-item" onclick="switchView('pagos', this)">
+            <i class="fa-solid fa-file-invoice-dollar"></i> Pago de Servicios
+        </div>
+        <div class="nav-item">
+            <i class="fa-solid fa-gear"></i> Configuración
+        </div>
 
-    <div class="main-container">
-        <aside class="sidebar">
-            <h2 class="panel-title">Nueva Operación</h2>
+        <div class="user-info">
+            <div class="avatar">W</div>
+            <div>
+                <div style="font-size: 14px; font-weight: 600;">Wilmer</div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Ver perfil</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <div class="header">
+            <h1>Bienvenido de nuevo</h1>
+            <div class="date-display">
+                <i class="fa-regular fa-calendar"></i>
+                Última conexión: 10 de Junio de 2026, 13:45
+            </div>
+        </div>
+
+        <div id="view-resumen" class="view-section active">
             
-            <div class="form-group">
-                <label>Nombre del Inversionista</label>
-                <input type="text" id="newInvestor" class="form-control" placeholder="Dueño de la inversión (Opcional)">
+            <div class="summary-cards">
+                <div class="card balance-card">
+                    <div class="card-title">Saldo Disponible (Cuenta Ahorros)</div>
+                    <div class="card-amount">$8,000.00</div>
+                    <div class="card-desc">No. Cuenta: **** 8472</div>
+                    <button class="btn-action" onclick="openModal()">Transferir Dinero</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title" style="color: var(--text-muted)">Gastos de este mes</div>
+                    <div class="card-amount" style="color: var(--text-main)">$1,250.50</div>
+                    <div class="card-desc" style="color: var(--danger)"><i class="fa-solid fa-arrow-trend-up"></i> +12% vs mes anterior</div>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label>Activo Financiero</label>
-                <select id="newAsset" class="form-control">
-                    <option value="S&P 500">S&P 500 (Índice)</option>
-                    <option value="NASDAQ">NASDAQ 100</option>
-                    <option value="BTC/USDT">Bitcoin (BTC/USDT)</option>
-                    <option value="ETH/USDT">Ethereum (ETH/USDT)</option>
-                    <option value="EUR/USD">Forex (EUR/USD)</option>
-                    <option value="XAU/USD">Oro (XAU/USD)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Monto a Invertir (USD)</label>
-                <input type="number" id="newAmount" class="form-control" placeholder="0.00">
-            </div>
-            <div class="form-group">
-                <label>Plazo Objetivo (Meses)</label>
-                <input type="number" id="newDuration" class="form-control" value="2">
-            </div>
-            <button class="btn btn-primary" onclick="app.executeTrade()">Abrir Posición</button>
-        </aside>
 
-        <main class="content">
-            <h2 class="panel-title">Operaciones Abiertas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Par / Activo</th>
-                        <th style="text-align: left;">Inversionista</th>
-                        <th>Inversión</th>
-                        <th>Valor Mercado</th>
-                        <th>Plazo</th>
-                        <th>P/L ($)</th>
-                        <th>P/L (%)</th>
-                    </tr>
-                </thead>
-                <tbody id="positionsTable"></tbody>
-            </table>
-        </main>
-    </div>
+            <div class="section-title">
+                Movimientos Recientes
+                <span style="font-size: 14px; color: var(--secondary-color); cursor: pointer; font-weight: 600;">Ver todos</span>
+            </div>
 
-    <div id="initModal" class="modal-overlay">
-        <div class="modal-content init-modal" style="padding: 30px;">
-            <h2 class="panel-title">Configuración Inicial</h2>
-            <div class="form-group">
-                <label>Nombre del Titular de la Cuenta</label>
-                <input type="text" id="initName" class="form-control" value="Dylan">
+            <div class="transaction-list">
+                <div class="tx-item">
+                    <div class="tx-icon icon-card"><i class="fa-solid fa-cart-shopping"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">Compra con Tarjeta *4021 - iShop Store</div>
+                        <div class="tx-date">10 de Junio, 2026 - 11:30 AM</div>
+                    </div>
+                    <div class="tx-amount negative">-$500.00</div>
+                </div>
+
+                <div class="tx-item">
+                    <div class="tx-icon icon-card"><i class="fa-solid fa-basket-shopping"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">Compra con Tarjeta *4021 - Supermercado</div>
+                        <div class="tx-date">10 de Junio, 2026 - 09:15 AM</div>
+                    </div>
+                    <div class="tx-amount negative">-$120.50</div>
+                </div>
+
+                <div class="tx-item">
+                    <div class="tx-icon icon-card"><i class="fa-solid fa-utensils"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">Compra con Tarjeta *4021 - Restaurante El Mirador</div>
+                        <div class="tx-date">9 de Junio, 2026 - 20:45 PM</div>
+                    </div>
+                    <div class="tx-amount negative">-$85.00</div>
+                </div>
+
+                <div class="tx-item">
+                    <div class="tx-icon icon-payment"><i class="fa-solid fa-bolt"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">Pago de Servicio - Empresa Eléctrica</div>
+                        <div class="tx-date">9 de Junio, 2026 - 14:20 PM</div>
+                    </div>
+                    <div class="tx-amount negative">-$45.00</div>
+                </div>
+
+                <div class="tx-item">
+                    <div class="tx-icon icon-transfer"><i class="fa-solid fa-arrow-down"></i></div>
+                    <div class="tx-details">
+                        <div class="tx-title">Transferencia Recibida - Servicios Digitales</div>
+                        <div class="tx-date">9 de Junio, 2026 - 09:00 AM</div>
+                    </div>
+                    <div class="tx-amount positive">+$1,500.00</div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Saldo Inicial (USD)</label>
-                <input type="number" id="initCapital" class="form-control" value="10000">
-            </div>
-            <button class="btn btn-primary" onclick="app.initializeProfile()">Entrar a Plataforma</button>
         </div>
-    </div>
 
-    <div id="tradeModal" class="modal-overlay hidden">
+        <div id="view-tarjetas" class="view-section">
+            <div class="section-title">Mis Tarjetas de Crédito y Débito</div>
+            <div class="summary-cards">
+                <div class="card" style="background: #1A1F36; color: white;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                        <i class="fa-brands fa-cc-visa" style="font-size: 30px;"></i>
+                        <i class="fa-solid fa-wifi" style="transform: rotate(90deg);"></i>
+                    </div>
+                    <div style="font-size: 20px; letter-spacing: 2px; margin-bottom: 15px;">**** **** **** 4021</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;">
+                        <span>Wilmer N.</span>
+                        <span>08/29</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="modal-overlay" id="transferModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div style="display: flex; align-items: center; gap: 20px;">
-                    <span id="modalAsset" style="font-weight: 700; font-size: 1.5rem; color: #fff;">BTC/USDT</span>
-                    <span id="modalCurrentPrice" class="font-mono" style="font-size: 1.4rem; font-weight: 600;">$0.00</span>
-                    <span id="modalPriceChange" style="font-size: 0.9rem;">+0.00%</span>
-                    <span class="investor-badge" id="modalInvestorName">Inversionista: -</span>
-                </div>
-                <button class="close-btn" onclick="app.closeDetailModal()">&times;</button>
+                <h3>Nueva Transferencia</h3>
+                <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
             </div>
-
-            <div class="modal-body">
-                <div class="chart-area">
-                    <div class="chart-toolbar">
-                        <button class="tf-btn">1m</button>
-                        <button class="tf-btn">5m</button>
-                        <button class="tf-btn active">15m</button>
-                        <button class="tf-btn">1H</button>
-                        <button class="tf-btn">4H</button>
-                        <button class="tf-btn">1D</button>
-                        
-                        <div class="drawing-hint">
-                            <span>✏️ Dibuja en el gráfico para trazar simulaciones y proyecciones</span>
-                        </div>
-                    </div>
-                    <div class="canvas-container">
-                        <canvas id="tradingChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="trade-panel">
-                    <div class="tabs-header">
-                        <button class="tab-btn active" onclick="app.switchTab('resumen')">Resumen</button>
-                        <button class="tab-btn" onclick="app.switchTab('operar')">Operar y Métricas</button>
-                    </div>
-                    
-                    <div class="tab-content">
-                        <div id="tab-resumen" class="tab-pane active">
-                            <div class="metric-card">
-                                <div class="data-label">Rendimiento (P/L)</div>
-                                <div id="modalPnl" class="font-mono" style="font-size: 1.8rem; margin: 10px 0;">$0.00</div>
-                                <div id="modalPnlPct" style="font-size: 0.9rem;">0.00%</div>
-                            </div>
-                            
-                            <div class="data-row"><span>Inversión Inicial</span><span id="modalInvested" class="data-val">$0.00</span></div>
-                            <div class="data-row"><span>Valor de Mercado</span><span id="modalMarketVal" class="data-val">$0.00</span></div>
-                            <div class="data-row"><span>Precio de Entrada</span><span id="modalEntryPrice" class="data-val">$0.00</span></div>
-                            
-                            <div class="divider"></div>
-                            
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Progreso de Plazo (<span id="modalDurationTxt">0/0</span> Meses)</div>
-                            <div class="progress-wrapper">
-                                <div id="modalProgressBar" class="progress-bar" style="width: 0%;"></div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            <button class="btn btn-danger" onclick="app.liquidateAll()">Cerrar Posición Completa</button>
-                        </div>
-
-                        <div id="tab-operar" class="tab-pane">
-                            <h3 style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-muted); text-transform: uppercase;">Métricas del Activo</h3>
-                            <div class="data-row"><span>Máx. 24h</span><span id="modalHigh" class="data-val text-profit">$0.00</span></div>
-                            <div class="data-row"><span>Mín. 24h</span><span id="modalLow" class="data-val text-loss">$0.00</span></div>
-                            
-                            <div class="divider"></div>
-                            
-                            <h3 style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-muted); text-transform: uppercase;">Acciones Específicas</h3>
-                            
-                            <div class="form-group">
-                                <label>Invertir más en esta operación (USD)</label>
-                                <div class="input-group">
-                                    <input type="number" id="opBuyAmount" class="form-control" placeholder="Ej: 100">
-                                    <button class="btn btn-success" onclick="app.opBuy()">Invertir</button>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Vender de esta operación (USD)</label>
-                                <div class="input-group">
-                                    <input type="number" id="opSellAmount" class="form-control" placeholder="Ej: 50">
-                                    <button class="btn btn-danger" onclick="app.opSell()">Vender</button>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-                            
-                            <h3 style="font-size: 0.9rem; margin-bottom: 15px; color: var(--text-muted); text-transform: uppercase;">Gestión de Riesgo (Límites)</h3>
-                            <div class="form-group">
-                                <label>Tomar Ganancia (Take Profit) en precio:</label>
-                                <input type="number" id="opTP" class="form-control" placeholder="Precio límite arriba">
-                            </div>
-                            <div class="form-group">
-                                <label>Parar Pérdida (Stop Loss) en precio:</label>
-                                <input type="number" id="opSL" class="form-control" placeholder="Precio límite abajo">
-                            </div>
-                            <button class="btn btn-outline" onclick="app.saveLimits()">Guardar Límites de Riesgo</button>
-                            <br><br>
-                            <button class="btn btn-outline" onclick="app.clearDrawings()" style="border-color: var(--danger); color: var(--danger);">Borrar Dibujos del Gráfico</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>Cuenta de Destino</label>
+                <input type="text" placeholder="Ej. 1234567890">
             </div>
+            <div class="form-group">
+                <label>Monto ($)</label>
+                <input type="number" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Concepto</label>
+                <input type="text" placeholder="Ej. Pago de alquiler">
+            </div>
+            <button class="btn-submit" onclick="simulateTransfer()">Transferir</button>
         </div>
     </div>
 
     <script>
-        const app = {
-            state: {
-                user: { name: 'Dylan' },
-                capital: 0,
-                available: 0,
-                simulatedDays: 0,
-                positions: [],
-                activeId: null
-            },
-            marketInterval: null,
-            chartCtx: null,
-            currentDrawing: null, // Para los dibujos en el canvas
+        // Función para cambiar entre secciones del menú
+        function switchView(viewId, element) {
+            // Quitar clase active de todos los nav-items
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Añadir clase active al clickeado
+            element.classList.add('active');
 
-            init() {
-                const saved = localStorage.getItem('proTradingApp_v4');
-                if (saved) {
-                    this.state = JSON.parse(saved);
-                    document.getElementById('initModal').classList.add('hidden');
-                    this.startEngine();
-                }
-                const canvas = document.getElementById('tradingChart');
-                this.chartCtx = canvas.getContext('2d');
-                this.setupCanvasDrawing(canvas);
-            },
+            // Ocultar todas las vistas
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            // Mostrar la vista seleccionada
+            const selectedView = document.getElementById('view-' + viewId);
+            if(selectedView) {
+                selectedView.classList.add('active');
+            }
+        }
 
-            initializeProfile() {
-                this.state.user.name = document.getElementById('initName').value || 'Dylan';
-                const cap = parseFloat(document.getElementById('initCapital').value) || 10000;
-                this.state.capital = cap;
-                this.state.available = cap;
-                this.state.positions = [];
-                document.getElementById('initModal').classList.add('hidden');
-                this.save();
-                this.startEngine();
-            },
+        // Funciones del Modal
+        function openModal() {
+            document.getElementById('transferModal').classList.add('active');
+        }
 
-            connectBank(b) { alert(`Conectando con API Segura de Banco ${b}...`); },
+        function closeModal() {
+            document.getElementById('transferModal').classList.remove('active');
+        }
+
+        // Simular una transferencia
+        function simulateTransfer() {
+            const btn = document.querySelector('.btn-submit');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Procesando...';
+            btn.style.opacity = '0.8';
             
-            withdrawFunds() {
-                const amt = prompt(`Saldo Disponible: ${this.fmtCur(this.state.available)}\nMonto a retirar:`);
-                if(amt && amt <= this.state.available && amt > 0) {
-                    this.state.available -= amt;
-                    this.save();
-                    alert(`Retiro de ${this.fmtCur(parseFloat(amt))} procesado.`);
-                }
-            },
-
-            save() { localStorage.setItem('proTradingApp_v4', JSON.stringify(this.state)); this.render(); },
-
-            /* --- OPERACIONES --- */
-            executeTrade() {
-                const asset = document.getElementById('newAsset').value;
-                const amount = parseFloat(document.getElementById('newAmount').value);
-                const duration = parseInt(document.getElementById('newDuration').value);
-                const investorName = document.getElementById('newInvestor').value || this.state.user.name;
-
-                if (isNaN(amount) || amount <= 0 || amount > this.state.available) return alert("Monto inválido o fondos insuficientes.");
-
-                this.state.available -= amount;
-
-                let base = asset.includes('BTC') ? 64000 : (asset.includes('ETH') ? 3500 : (asset.includes('XAU') ? 2300 : 150));
-
-                const pos = {
-                    id: 'POS_' + Date.now(),
-                    asset, duration,
-                    investor: investorName, // Asignación del nombre del inversionista
-                    invested: amount, shares: amount / base,
-                    startPrice: base, currentPrice: base,
-                    startDay: this.state.simulatedDays,
-                    tp: null, sl: null,
-                    history: Array(50).fill({o: base, h: base, l: base, c: base}),
-                    drawings: [] // Matriz para almacenar los trazos
-                };
-
-                this.state.positions.push(pos);
-                document.getElementById('newAmount').value = '';
-                document.getElementById('newInvestor').value = '';
-                this.save();
-            },
-
-            /* ACCIONES DENTRO DEL MODAL */
-            opBuy() {
-                const p = this.getPos();
-                const amt = parseFloat(document.getElementById('opBuyAmount').value);
-                if(isNaN(amt) || amt <= 0 || amt > this.state.available) return alert("Monto inválido.");
-                
-                this.state.available -= amt;
-                p.invested += amt;
-                p.shares += amt / p.currentPrice;
-                document.getElementById('opBuyAmount').value = '';
-                this.save(); this.updateModal();
-            },
-
-            opSell() {
-                const p = this.getPos();
-                const amt = parseFloat(document.getElementById('opSellAmount').value);
-                const currentVal = p.shares * p.currentPrice;
-                if(isNaN(amt) || amt <= 0 || amt > currentVal) return alert("No puedes vender más del valor actual.");
-                
-                // Reducir proporcinalmente
-                const ratio = amt / currentVal;
-                p.shares -= p.shares * ratio;
-                p.invested -= p.invested * ratio; 
-                this.state.available += amt;
-                
-                document.getElementById('opSellAmount').value = '';
-                this.save(); this.updateModal();
-            },
-
-            saveLimits() {
-                const p = this.getPos();
-                const tp = parseFloat(document.getElementById('opTP').value);
-                const sl = parseFloat(document.getElementById('opSL').value);
-                p.tp = isNaN(tp) ? null : tp;
-                p.sl = isNaN(sl) ? null : sl;
-                alert("Límites TP/SL actualizados.");
-                this.save();
-            },
-
-            liquidateAll() {
-                if(!confirm("¿Cerrar posición completamente?")) return;
-                const idx = this.state.positions.findIndex(p => p.id === this.state.activeId);
-                const p = this.state.positions[idx];
-                this.state.available += (p.shares * p.currentPrice);
-                this.state.positions.splice(idx, 1);
-                this.closeDetailModal();
-                this.save();
-            },
-
-            /* --- MOTOR DE MERCADO (OHLC) --- */
-            startEngine() {
-                if(this.marketInterval) clearInterval(this.marketInterval);
-                this.render();
-
-                this.marketInterval = setInterval(() => {
-                    this.state.simulatedDays += 1;
-                    
-                    for (let i = this.state.positions.length - 1; i >= 0; i--) {
-                        let pos = this.state.positions[i];
-                        const vol = pos.asset.includes('BTC') ? 0.015 : 0.005;
-                        
-                        let open = pos.currentPrice;
-                        // Simulación Aleatoria
-                        let change = 1 + ((Math.random() * vol * 2) - vol);
-                        let close = open * change;
-                        let high = Math.max(open, close) * (1 + Math.random() * 0.003);
-                        let low = Math.min(open, close) * (1 - Math.random() * 0.003);
-                        
-                        pos.currentPrice = close;
-                        pos.history.push({o: open, h: high, l: low, c: close});
-                        if(pos.history.length > 80) pos.history.shift();
-
-                        // Comprobar TP/SL
-                        if (pos.tp && close >= pos.tp) {
-                            alert(`¡Take Profit alcanzado en ${pos.asset}! Posición cerrada automáticamente.`);
-                            this.state.available += (pos.shares * close);
-                            this.state.positions.splice(i, 1);
-                            if(this.state.activeId === pos.id) this.closeDetailModal();
-                        } else if (pos.sl && close <= pos.sl) {
-                            alert(`¡Stop Loss tocado en ${pos.asset}! Posición cerrada para evitar pérdidas.`);
-                            this.state.available += (pos.shares * close);
-                            this.state.positions.splice(i, 1);
-                            if(this.state.activeId === pos.id) this.closeDetailModal();
-                        }
-                    }
-                    this.save();
-                    if(this.state.activeId) this.updateModal();
+            setTimeout(() => {
+                btn.innerHTML = 'Transferencia Exitosa';
+                btn.style.background = 'var(--success)';
+                setTimeout(() => {
+                    closeModal();
+                    // Resetear el botón
+                    btn.innerHTML = 'Transferir';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.style.opacity = '1';
                 }, 1500);
-            },
-
-            /* --- LÓGICA DE DIBUJO EN CANVAS --- */
-            setupCanvasDrawing(canvas) {
-                let isDrawing = false;
-                
-                const getMousePos = (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    return {
-                        x: e.clientX - rect.left,
-                        y: e.clientY - rect.top
-                    };
-                };
-
-                canvas.addEventListener('mousedown', (e) => {
-                    if(!this.state.activeId) return;
-                    isDrawing = true;
-                    this.currentDrawing = [getMousePos(e)];
-                });
-
-                canvas.addEventListener('mousemove', (e) => {
-                    if(!isDrawing || !this.currentDrawing) return;
-                    this.currentDrawing.push(getMousePos(e));
-                    this.drawCandles(this.getPos()); // Redibujar rápido para ver el trazo
-                });
-
-                const stopDrawing = () => {
-                    if(!isDrawing) return;
-                    isDrawing = false;
-                    const p = this.getPos();
-                    if(p && this.currentDrawing) {
-                        if(!p.drawings) p.drawings = [];
-                        p.drawings.push(this.currentDrawing);
-                        this.save();
-                    }
-                    this.currentDrawing = null;
-                };
-
-                canvas.addEventListener('mouseup', stopDrawing);
-                canvas.addEventListener('mouseout', stopDrawing);
-            },
-
-            clearDrawings() {
-                const p = this.getPos();
-                if(p) {
-                    p.drawings = [];
-                    this.save();
-                    this.updateModal();
-                }
-            },
-
-            /* --- UI RENDER --- */
-            render() {
-                document.getElementById('ui-profile-string').textContent = this.state.user.name;
-                let totalInv = 0, currentVal = 0;
-                const tbody = document.getElementById('positionsTable');
-                tbody.innerHTML = '';
-
-                this.state.positions.forEach(p => {
-                    const val = p.shares * p.currentPrice;
-                    const pnl = val - p.invested;
-                    const pct = (pnl/p.invested)*100;
-                    totalInv += p.invested; currentVal += val;
-
-                    const cls = pnl >= 0 ? 'text-profit' : 'text-loss';
-                    const sign = pnl >= 0 ? '+' : '';
-
-                    const tr = document.createElement('tr');
-                    tr.onclick = () => this.openDetailModal(p.id);
-                    tr.innerHTML = `
-                        <td style="font-weight:bold; color:white;">${p.asset}</td>
-                        <td style="text-align: left;"><span class="investor-badge">${p.investor || this.state.user.name}</span></td>
-                        <td class="font-mono">${this.fmtCur(p.invested)}</td>
-                        <td class="font-mono">${this.fmtCur(val)}</td>
-                        <td>${p.duration} Meses</td>
-                        <td class="${cls} font-mono">${sign}${this.fmtCur(pnl)}</td>
-                        <td class="${cls}">${sign}${pct.toFixed(2)}%</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                document.getElementById('ui-total-balance').textContent = this.fmtCur(this.state.available);
-                document.getElementById('ui-invested').textContent = this.fmtCur(totalInv);
-                const gPnl = currentVal - totalInv;
-                document.getElementById('ui-global-pnl').textContent = `${gPnl>=0?'+':''}${this.fmtCur(gPnl)}`;
-                document.getElementById('ui-global-pnl').className = 'stat-value font-mono ' + (gPnl>=0?'text-profit':'text-loss');
-            },
-
-            /* --- MODAL Y PESTAÑAS --- */
-            getPos() { return this.state.positions.find(p => p.id === this.state.activeId); },
-            
-            switchTab(tab) {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                event.target.classList.add('active');
-                document.getElementById('tab-' + tab).classList.add('active');
-            },
-
-            openDetailModal(id) {
-                this.state.activeId = id;
-                document.getElementById('tradeModal').classList.remove('hidden');
-                
-                const p = this.getPos();
-                document.getElementById('opTP').value = p.tp || '';
-                document.getElementById('opSL').value = p.sl || '';
-                
-                this.updateModal();
-            },
-            closeDetailModal() {
-                this.state.activeId = null;
-                document.getElementById('tradeModal').classList.add('hidden');
-            },
-
-            updateModal() {
-                const p = this.getPos();
-                if(!p) return;
-
-                const val = p.shares * p.currentPrice;
-                const pnl = val - p.invested;
-                const pct = (pnl/p.invested)*100;
-                const isProf = pnl >= 0;
-
-                // Cabecera
-                document.getElementById('modalAsset').textContent = p.asset;
-                document.getElementById('modalInvestorName').textContent = `Inv: ${p.investor || this.state.user.name}`;
-                document.getElementById('modalCurrentPrice').textContent = this.fmtCur(p.currentPrice);
-                document.getElementById('modalCurrentPrice').className = 'font-mono ' + (isProf ? 'text-profit' : 'text-loss');
-                document.getElementById('modalPriceChange').textContent = `${isProf?'+':''}${pct.toFixed(2)}%`;
-                document.getElementById('modalPriceChange').className = isProf ? 'text-profit' : 'text-loss';
-
-                // Resumen
-                document.getElementById('modalPnl').textContent = `${isProf?'+':''}${this.fmtCur(pnl)}`;
-                document.getElementById('modalPnl').className = 'font-mono ' + (isProf?'text-profit':'text-loss');
-                document.getElementById('modalPnlPct').textContent = `${isProf?'+':''}${pct.toFixed(2)}% desde apertura`;
-                document.getElementById('modalPnlPct').className = isProf?'text-profit':'text-loss';
-                
-                document.getElementById('modalInvested').textContent = this.fmtCur(p.invested);
-                document.getElementById('modalMarketVal').textContent = this.fmtCur(val);
-                document.getElementById('modalEntryPrice').textContent = this.fmtCur(p.startPrice);
-
-                const elapDays = this.state.simulatedDays - p.startDay;
-                const prog = Math.min((elapDays / (p.duration*30))*100, 100);
-                document.getElementById('modalDurationTxt').textContent = `${(elapDays/30).toFixed(1)} / ${p.duration}`;
-                document.getElementById('modalProgressBar').style.width = `${prog}%`;
-
-                // Métricas Avanzadas (Mín/Máx en base al historial)
-                let max24 = Math.max(...p.history.map(h => h.h));
-                let min24 = Math.min(...p.history.map(h => h.l));
-                document.getElementById('modalHigh').textContent = this.fmtCur(max24);
-                document.getElementById('modalLow').textContent = this.fmtCur(min24);
-
-                this.drawCandles(p);
-            },
-
-            /* --- DIBUJO DE VELAS JAPONESAS Y TRAZOS --- */
-            drawCandles(p) {
-                const canvas = document.getElementById('tradingChart');
-                const pEl = canvas.parentElement;
-                canvas.width = pEl.clientWidth;
-                canvas.height = pEl.clientHeight;
-                const ctx = this.chartCtx;
-                const W = canvas.width, H = canvas.height;
-                ctx.clearRect(0,0,W,H);
-
-                const data = p.history;
-                if(data.length < 2) return;
-
-                // Encontrar rango min/max total para escalar
-                const minP = Math.min(...data.map(d => d.l)) * 0.999;
-                const maxP = Math.max(...data.map(d => d.h)) * 1.001;
-                const range = maxP - minP;
-
-                const mapY = (val) => H - ((val - minP) / range) * H;
-                const candleWidth = (W / data.length) * 0.6; // 60% del espacio
-                
-                // Dibujar Grid Horizontal
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-                for(let i=1; i<5; i++){
-                    ctx.beginPath(); ctx.moveTo(0, H*(i/5)); ctx.lineTo(W, H*(i/5)); ctx.stroke();
-                }
-
-                // Dibujar velas
-                data.forEach((c, i) => {
-                    const x = (i / data.length) * W + (W / data.length / 2);
-                    const isGreen = c.c >= c.o;
-                    const color = isGreen ? '#0ecb81' : '#f6465d';
-
-                    ctx.strokeStyle = color;
-                    ctx.fillStyle = color;
-                    ctx.lineWidth = 1.5;
-
-                    // Wick (Sombra)
-                    ctx.beginPath();
-                    ctx.moveTo(x, mapY(c.h));
-                    ctx.lineTo(x, mapY(c.l));
-                    ctx.stroke();
-
-                    // Body (Cuerpo)
-                    const yTop = mapY(Math.max(c.o, c.c));
-                    const yBot = mapY(Math.min(c.o, c.c));
-                    let bodyH = yBot - yTop;
-                    if(bodyH < 1) bodyH = 1; // Mínimo 1px de cuerpo
-                    
-                    ctx.fillRect(x - candleWidth/2, yTop, candleWidth, bodyH);
-                });
-
-                // Línea punteada precio actual
-                const lastY = mapY(p.currentPrice);
-                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-                ctx.setLineDash([4,4]);
-                ctx.beginPath(); ctx.moveTo(0, lastY); ctx.lineTo(W, lastY); ctx.stroke();
-                ctx.setLineDash([]);
-                
-                // Función auxiliar para dibujar trazos
-                const renderPath = (path) => {
-                    if(!path || path.length < 2) return;
-                    ctx.beginPath();
-                    ctx.moveTo(path[0].x, path[0].y);
-                    for(let i=1; i<path.length; i++) {
-                        ctx.lineTo(path[i].x, path[i].y);
-                    }
-                    ctx.stroke();
-                };
-
-                // Dibujar los trazos guardados (Proyecciones del usuario)
-                ctx.strokeStyle = 'var(--warning)'; // Color dorado para proyecciones
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                
-                if (p.drawings && p.drawings.length > 0) {
-                    p.drawings.forEach(renderPath);
-                }
-
-                // Dibujar el trazo actual en tiempo real
-                if (this.currentDrawing) {
-                    renderPath(this.currentDrawing);
-                }
-            },
-
-            fmtCur(num) { return '$' + parseFloat(num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
-        };
-
-        window.onload = () => app.init();
+            }, 2000);
+        }
     </script>
 </body>
 </html>
